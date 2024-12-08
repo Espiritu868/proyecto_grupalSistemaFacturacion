@@ -1,13 +1,74 @@
 
 package MAIN;
 
+import DAO.Conexion;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import static java.util.stream.Collectors.toList;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author Ever Chavez
  */
 public class FrmFactura extends javax.swing.JFrame {
 
-    
+    public void AddNewFacture() {
+    Conexion conn = new Conexion("proyecto_grupal");
+    Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+        
+        float total = Float.parseFloat(txtTotal.getSelectedText());
+        float methodOfPayment = Float.parseFloat(String.valueOf(cboFormaDePago.getSelectedItem()));
+        float cash = Float.parseFloat(txtEfectivo.getSelectedText());
+        float change = Float.parseFloat(txtCambio.getSelectedText());
+        String observations = txtObservaciones.getSelectedText();
+
+        // Conexión a la base de datos
+        con = conn.getConexion();
+        String sql = "INSERT INTO dbfacture (Total, MethodOfPayment, Cash, Change, Observations) VALUES (?,?,?,?,?)";
+        ps = con.prepareStatement(sql);
+
+        // Configurar los parámetros de la consulta
+        ps.setFloat(1, total);
+        ps.setFloat(2, methodOfPayment);
+        ps.setFloat(3, cash);
+        ps.setFloat(4, change);
+        ps.setString(5, observations);
+
+        // Ejecutar la consulta y verificar inserción
+        int rowsInserted = ps.executeUpdate();
+
+        if (rowsInserted > 0) {
+            JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+            toList(); // Actualizar lista de datos
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
+        }
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Verifique los campos numéricos (anticipo y final).", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            if (ps != null) ps.close();
+            if (con != null) con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
     public FrmFactura() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -30,19 +91,33 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        lblPhone7 = new javax.swing.JLabel();
+        btnSave = new javax.swing.JButton();
         btnSearchFactureNumber = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         cboFactureState = new javax.swing.JComboBox<>();
         txtNumeroFactura = new javax.swing.JTextField();
         txtDirection = new javax.swing.JTextField();
         txtRtn = new javax.swing.JTextField();
+        btnSave1 = new javax.swing.JButton();
+        lblPhone8 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         txtClientCode = new javax.swing.JTextField();
         txtFinalClient = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        txtObservaciones = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        cboFormaDePago = new javax.swing.JComboBox<>();
+        txtTotal = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        txtEfectivo = new javax.swing.JTextField();
+        txtCambio = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -114,6 +189,24 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel7.setText("Direccion");
         jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 180, 150, -1));
 
+        lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone7.setText("IMPRIMIR");
+        jPanel1.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 690, -1, -1));
+
+        btnSave.setBackground(new java.awt.Color(255, 204, 51));
+        btnSave.setForeground(new java.awt.Color(255, 204, 51));
+        btnSave.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\print64x64.png")); // NOI18N
+        btnSave.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSave.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\print64x64.png")); // NOI18N
+        btnSave.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\print72x72.png")); // NOI18N
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 600, 80, 70));
+
         btnSearchFactureNumber.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchFactureNumber.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchFactureNumber.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
@@ -132,6 +225,24 @@ public class FrmFactura extends javax.swing.JFrame {
 
         txtRtn.setEditable(false);
         jPanel1.add(txtRtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 180, 160, 30));
+
+        btnSave1.setBackground(new java.awt.Color(255, 204, 51));
+        btnSave1.setForeground(new java.awt.Color(255, 204, 51));
+        btnSave1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
+        btnSave1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSave1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
+        btnSave1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\save64x64.png")); // NOI18N
+        btnSave1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSave1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnSave1, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 600, 80, 70));
+
+        lblPhone8.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone8.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone8.setText("GUARDAR");
+        jPanel1.add(lblPhone8, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 690, -1, -1));
 
         jLabel10.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 24)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
@@ -163,10 +274,65 @@ public class FrmFactura extends javax.swing.JFrame {
         jPanel1.add(txtClientCode, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 160, 30));
         jPanel1.add(txtFinalClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 140, 530, 30));
 
-        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Captura de pantalla 2024-12-01 011716.png")); // NOI18N
-        jLabel1.setText("jLabel1");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, -10, 360, 740));
+        jPanel2.setBackground(new java.awt.Color(255, 204, 102));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("FORMA DE PAGO");
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 150, 20));
+
+        txtObservaciones.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        txtObservaciones.setText(" ");
+        jPanel2.add(txtObservaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 280, 290));
+
+        jLabel8.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("OBSERVACIONES");
+        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 360, 160, 20));
+
+        cboFormaDePago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "EFECTIVO", "TRANSFERENCIA", "TARJETA VISA/DEBITO", " " }));
+        jPanel2.add(cboFormaDePago, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, 280, 40));
+
+        txtTotal.setEditable(false);
+        txtTotal.setForeground(new java.awt.Color(0, 0, 0));
+        txtTotal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtTotal.setText("1");
+        jPanel2.add(txtTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 70, 280, 30));
+
+        jLabel11.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel11.setText("TOTAL A PAGAR");
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 150, 20));
+
+        jLabel12.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel12.setText("EFECTIVO");
+        jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 150, 20));
+
+        txtEfectivo.setForeground(new java.awt.Color(0, 0, 0));
+        txtEfectivo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtEfectivo.setText("1");
+        txtEfectivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtEfectivoActionPerformed(evt);
+            }
+        });
+        jPanel2.add(txtEfectivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 230, 280, 30));
+
+        txtCambio.setEditable(false);
+        txtCambio.setForeground(new java.awt.Color(0, 0, 0));
+        txtCambio.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        txtCambio.setText("1");
+        txtCambio.setToolTipText("");
+        jPanel2.add(txtCambio, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 280, 30));
+
+        jLabel13.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel13.setText("CAMBIO");
+        jPanel2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 280, 150, 20));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 10, 370, 700));
 
         lblBackground.setBackground(new java.awt.Color(255, 255, 102));
         lblBackground.setForeground(new java.awt.Color(255, 255, 102));
@@ -200,6 +366,19 @@ public class FrmFactura extends javax.swing.JFrame {
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnCloseActionPerformed
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void btnSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSave1ActionPerformed
+      
+        AddNewFacture();
+    }//GEN-LAST:event_btnSave1ActionPerformed
+
+    private void txtEfectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEfectivoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtEfectivoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -251,28 +430,42 @@ public class FrmFactura extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnReturn;
+    private javax.swing.JButton btnSave;
+    private javax.swing.JButton btnSave1;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSearchFactureNumber;
     private javax.swing.JComboBox<String> cboFactureState;
+    private javax.swing.JComboBox<String> cboFormaDePago;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblPhone3;
     private javax.swing.JLabel lblPhone5;
+    private javax.swing.JLabel lblPhone7;
+    private javax.swing.JLabel lblPhone8;
+    private javax.swing.JTextField txtCambio;
     private javax.swing.JTextField txtClientCode;
     private javax.swing.JTextField txtDirection;
+    private javax.swing.JTextField txtEfectivo;
     private javax.swing.JTextField txtFinalClient;
     private javax.swing.JTextField txtNumeroFactura;
+    private javax.swing.JTextField txtObservaciones;
     private javax.swing.JTextField txtRtn;
+    private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables
 }

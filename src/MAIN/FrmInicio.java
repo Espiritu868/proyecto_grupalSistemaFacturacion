@@ -24,18 +24,25 @@ public class FrmInicio extends javax.swing.JFrame {
         lblComputadoras2 = new javax.swing.JLabel();
         lblPhone1 = new javax.swing.JLabel();
         lblComputadoras3 = new javax.swing.JLabel();
-        lblComputadoras4 = new javax.swing.JLabel();
-        lblPhone2 = new javax.swing.JLabel();
         btnComputer = new javax.swing.JButton();
         btnPrinter = new javax.swing.JButton();
         btnPhone = new javax.swing.JButton();
         btnFacture = new javax.swing.JButton();
         btnNewClient = new javax.swing.JButton();
+        lblPhone6 = new javax.swing.JLabel();
         btnProductAdd = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
         lblPhone3 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        lblPhone4 = new javax.swing.JLabel();
         btnClose = new javax.swing.JButton();
         lblPhone5 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -44,34 +51,24 @@ public class FrmInicio extends javax.swing.JFrame {
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblComputadoras1.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblComputadoras1.setForeground(new java.awt.Color(255, 255, 255));
+        lblComputadoras1.setForeground(new java.awt.Color(0, 0, 0));
         lblComputadoras1.setText("COMPUTADORAS");
         jPanel1.add(lblComputadoras1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, -1, -1));
 
         lblComputadoras2.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblComputadoras2.setForeground(new java.awt.Color(255, 255, 255));
+        lblComputadoras2.setForeground(new java.awt.Color(0, 0, 0));
         lblComputadoras2.setText("FACTURAS");
         jPanel1.add(lblComputadoras2, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 160, -1, -1));
 
         lblPhone1.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblPhone1.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone1.setForeground(new java.awt.Color(0, 0, 0));
         lblPhone1.setText("PHONE");
         jPanel1.add(lblPhone1, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, -1, -1));
 
         lblComputadoras3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblComputadoras3.setForeground(new java.awt.Color(255, 255, 255));
+        lblComputadoras3.setForeground(new java.awt.Color(0, 0, 0));
         lblComputadoras3.setText("IMPRESORAS ");
         jPanel1.add(lblComputadoras3, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 160, -1, -1));
-
-        lblComputadoras4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblComputadoras4.setForeground(new java.awt.Color(255, 255, 255));
-        lblComputadoras4.setText("AGREGAR PRODUCTO");
-        jPanel1.add(lblComputadoras4, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 350, -1, -1));
-
-        lblPhone2.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblPhone2.setForeground(new java.awt.Color(255, 255, 255));
-        lblPhone2.setText("NUEVO CLIENTE");
-        jPanel1.add(lblPhone2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 350, -1, -1));
 
         btnComputer.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\desktop90x90pp.png")); // NOI18N
         btnComputer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -128,6 +125,11 @@ public class FrmInicio extends javax.swing.JFrame {
         });
         jPanel1.add(btnNewClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, -1, -1));
 
+        lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone6.setForeground(new java.awt.Color(0, 0, 0));
+        lblPhone6.setText("NUEVO CLIENTE");
+        jPanel1.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, -1, -1));
+
         btnProductAdd.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\agregarproducto90x90pp.png")); // NOI18N
         btnProductAdd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnProductAdd.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\agregarproducto90x90pp.png")); // NOI18N
@@ -157,6 +159,31 @@ public class FrmInicio extends javax.swing.JFrame {
         lblPhone3.setText("REGRESAR");
         jPanel1.add(lblPhone3, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 490, -1, -1));
 
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setForeground(new java.awt.Color(255, 255, 255));
+
+        lblPhone4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone4.setForeground(new java.awt.Color(0, 0, 0));
+        lblPhone4.setText("NUEVO CLIENTE");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblPhone4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addComponent(lblPhone4)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 360, 150, -1));
+
         btnClose.setBackground(new java.awt.Color(255, 204, 51));
         btnClose.setForeground(new java.awt.Color(255, 204, 51));
         btnClose.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
@@ -174,6 +201,90 @@ public class FrmInicio extends javax.swing.JFrame {
         lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone5.setText("CERRAR");
         jPanel1.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, -1, -1));
+
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 150, 20));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 160, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 160, 20));
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 160, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, -1, -1));
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 160, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 160, -1, -1));
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 160, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 20, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 160, -1, -1));
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 150, Short.MAX_VALUE)
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 22, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 150, -1));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel1.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -318,16 +429,23 @@ public class FrmInicio extends javax.swing.JFrame {
     private javax.swing.JButton btnPrinter;
     private javax.swing.JButton btnProductAdd;
     private javax.swing.JButton btnReturn;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblComputadoras1;
     private javax.swing.JLabel lblComputadoras2;
     private javax.swing.JLabel lblComputadoras3;
-    private javax.swing.JLabel lblComputadoras4;
     private javax.swing.JLabel lblPhone1;
-    private javax.swing.JLabel lblPhone2;
     private javax.swing.JLabel lblPhone3;
+    private javax.swing.JLabel lblPhone4;
     private javax.swing.JLabel lblPhone5;
+    private javax.swing.JLabel lblPhone6;
     // End of variables declaration//GEN-END:variables
 
     

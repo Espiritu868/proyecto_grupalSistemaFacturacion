@@ -3,8 +3,10 @@ package MAIN;
 
 import java.sql.*;
 import DAO.Conexion;
+import java.awt.Color;
 import static java.util.stream.Collectors.toList;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -12,10 +14,79 @@ import javax.swing.JOptionPane;
  */
 public class FrmNewClient extends javax.swing.JFrame {
     
-    String mensaje; 
-public void InsertNewClient(){
-    
+    DefaultTableModel modelo;
+        
     Conexion conn = new Conexion("proyecto_grupal");
+
+    String mensaje; 
+ 
+    
+private void toList(){
+    
+    Object dataClient[] = new Object[4];
+    modelo = (DefaultTableModel) dtClientes.getModel();
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    Statement st = null;
+    modelo.setRowCount(0);
+    
+    try {
+        con = conn.getConexion();
+        st = con.createStatement();
+        rs = st.executeQuery("select * from dbaddclient where Client like '%" + txtShowForName.getText() + "%'");
+        
+        while(rs.next()){
+            dataClient[0] = rs.getString("IdClient");
+            dataClient[1] = rs.getString("Client");
+            dataClient[2] = rs.getString("Identity");
+            dataClient[3] = rs.getString("Phone");
+            
+            
+            modelo.addRow(dataClient);
+            
+            dtClientes.setModel(modelo);
+            
+        }
+    } catch (Exception e) {
+        System.out.println("Error en la consulta.");
+    }
+        
+}   
+
+private void showForId(String Id){
+    
+   
+    Connection con = null;
+ 
+    ResultSet rs = null;
+    Statement st = null;
+  
+    
+    try {
+        con = conn.getConexion();
+        st = con.createStatement();
+        rs = st.executeQuery("select * from dbaddclient where IdClient = '"+ Id +"'");
+        
+        while(rs.next()){
+            txtId.setText(rs.getString("IdClient"));
+            txtName.setText(rs.getString("Client"));
+            txtPhone.setText(rs.getString("Phone"));
+            txtDireccion.setText(rs.getString("Direction"));
+            txtRTN.setText(rs.getString("RTN"));
+            txtIdenty.setText(rs.getString("Identity")); 
+            cboType.setSelectedItem(rs.getString("Type"));
+
+        }
+    } catch (Exception e) {
+        System.out.println("Error en la consulta.");
+    }
+        
+}   
+
+    
+
+public void InsertNewClient(){
     Connection con = null;
     PreparedStatement ps = null;
 
@@ -23,7 +94,8 @@ public void InsertNewClient(){
 
         String name = txtName.getText();
         String phone = txtPhone.getText();
-        String rtn = txtRtn.getText();
+        String direction = txtDireccion.getText();
+        String rtn = txtRTN.getText();
         String identy = txtIdenty.getText();
         String type = String.valueOf(cboType.getSelectedItem());
         
@@ -32,14 +104,15 @@ public void InsertNewClient(){
         
 
         con = conn.getConexion();
-        String sql = "INSERT INTO dbaddclient (Client, Phone, RTN, Identity, Type) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO dbaddclient (Client, Phone, RTN, Identity, Type) VALUES (?, ?, ?, ?, ?,?)";
         ps = con.prepareStatement(sql);
 
         ps.setString(1, name);   
-        ps.setString(2, phone);       
-        ps.setString(3, rtn);
-        ps.setString(4, identy);
-        ps.setString(5, type);
+        ps.setString(2, phone); 
+        ps.setString(3, direction);
+        ps.setString(4, rtn);
+        ps.setString(5, identy);
+        ps.setString(6, type);
         
         int rowsInserted = ps.executeUpdate();
 
@@ -70,6 +143,10 @@ public void InsertNewClient(){
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        
+        toList();
+        jPanel1.setVisible(false);
+        
     }
 
     
@@ -78,12 +155,17 @@ public void InsertNewClient(){
     private void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        dtClientes = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         txtIdenty = new javax.swing.JTextField();
+        btnSearchForIdClient = new javax.swing.JButton();
+        btnSearchforNameClient = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        txtName = new javax.swing.JTextField();
+        txtShowForId = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -92,18 +174,65 @@ public void InsertNewClient(){
         btnClose1 = new javax.swing.JButton();
         lblPhone5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        txtRtn = new javax.swing.JTextField();
+        txtDireccion = new javax.swing.JTextField();
         cboType = new javax.swing.JComboBox<>();
         btnSearch = new javax.swing.JButton();
-        txtIngreseNombreCliente2 = new javax.swing.JTextField();
         lblPhone6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         txtPhone = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txtName = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        txtShowForName = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtRTN = new javax.swing.JTextField();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        dtClientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "NOMBRE", "IDENTIDAD", "TELEFONO"
+            }
+        ));
+        dtClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dtClientesMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(dtClientes);
+        if (dtClientes.getColumnModel().getColumnCount() > 0) {
+            dtClientes.getColumnModel().getColumn(0).setPreferredWidth(30);
+            dtClientes.getColumnModel().getColumn(1).setPreferredWidth(300);
+        }
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 453, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 421, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, 450, 80));
 
         jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\addclient 90x90.png")); // NOI18N
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, -1, -1));
@@ -114,8 +243,30 @@ public void InsertNewClient(){
         jLabel1.setText("Identidad");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 240, 190, -1));
 
-        txtIdenty.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        txtIdenty.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel2.add(txtIdenty, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 240, 170, -1));
+
+        btnSearchForIdClient.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
+        btnSearchForIdClient.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSearchForIdClient.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
+        btnSearchForIdClient.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearchForIdClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchForIdClientActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnSearchForIdClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 110, 70, 50));
+
+        btnSearchforNameClient.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
+        btnSearchforNameClient.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSearchforNameClient.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
+        btnSearchforNameClient.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearchforNameClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchforNameClientActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnSearchforNameClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 70, 70, 50));
 
         btnSave.setBackground(new java.awt.Color(255, 204, 51));
         btnSave.setForeground(new java.awt.Color(255, 204, 51));
@@ -133,12 +284,23 @@ public void InsertNewClient(){
         jLabel3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("Nombre Cliente:");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 160, 190, -1));
+        jLabel3.setText("Buscar Por ID:");
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 120, 220, -1));
 
-        txtName.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        txtName.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        jPanel2.add(txtName, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, 480, -1));
+        txtShowForId.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtShowForId.setText("Ingrese Id Cliente");
+        txtShowForId.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        txtShowForId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtShowForIdActionPerformed(evt);
+            }
+        });
+        txtShowForId.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtShowForIdKeyPressed(evt);
+            }
+        });
+        jPanel2.add(txtShowForId, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 120, 130, 30));
 
         jLabel4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
@@ -147,7 +309,7 @@ public void InsertNewClient(){
         jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, 190, -1));
 
         txtId.setEditable(false);
-        txtId.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        txtId.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         txtId.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jPanel2.add(txtId, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 200, 170, -1));
 
@@ -196,13 +358,13 @@ public void InsertNewClient(){
         jLabel6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel6.setText("RTN:");
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 240, 190, -1));
+        jLabel6.setText("Direccion:");
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 230, 190, -1));
 
-        txtRtn.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        jPanel2.add(txtRtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 240, 170, -1));
+        txtDireccion.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jPanel2.add(txtDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 230, 170, 50));
 
-        cboType.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        cboType.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         cboType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "        ", "PERSONA", "INSTITUCION", "EMPRESA" }));
         jPanel2.add(cboType, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 290, 170, -1));
 
@@ -210,11 +372,7 @@ public void InsertNewClient(){
         btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearch.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
-        jPanel2.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 100, 70, 50));
-
-        txtIngreseNombreCliente2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtIngreseNombreCliente2.setText("Buscar Cliente");
-        jPanel2.add(txtIngreseNombreCliente2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 110, 550, -1));
+        jPanel2.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 430, 80, 70));
 
         lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone6.setForeground(new java.awt.Color(255, 255, 255));
@@ -227,8 +385,43 @@ public void InsertNewClient(){
         jLabel7.setText("Telefono:");
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 200, 190, -1));
 
-        txtPhone.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        txtPhone.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel2.add(txtPhone, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 200, 170, -1));
+
+        jLabel8.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel8.setText("Nombre Cliente:");
+        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 160, 190, -1));
+
+        txtName.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtName.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        jPanel2.add(txtName, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, 480, -1));
+
+        jLabel9.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel9.setText("Buscar Nombre Cliente:");
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 80, 220, -1));
+
+        txtShowForName.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtShowForName.setText("Ingrese Nombre Cliente");
+        txtShowForName.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        txtShowForName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtShowForNameKeyPressed(evt);
+            }
+        });
+        jPanel2.add(txtShowForName, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 80, 370, 30));
+
+        jLabel10.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel10.setText("RTN:");
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 280, 190, -1));
+
+        txtRTN.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jPanel2.add(txtRTN, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 280, 170, -1));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel2.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -267,32 +460,56 @@ public void InsertNewClient(){
         this.setVisible(false);}
     }//GEN-LAST:event_btnSaveActionPerformed
 
+    private void btnSearchforNameClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchforNameClientActionPerformed
+        toList();
+    }//GEN-LAST:event_btnSearchforNameClientActionPerformed
+
+    private void txtShowForNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtShowForNameKeyPressed
+        String texto = txtShowForName.getText();
+        if (!texto.equals("Ingrese Nombre Cliente") && !texto.isEmpty()) {
+            jPanel1.setVisible(true);
+        } else {
+            jPanel1.setVisible(false);
+        }
+        
+        
+        toList();
+    }//GEN-LAST:event_txtShowForNameKeyPressed
+
+    private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        int fila =  dtClientes.getSelectedRow();
+        String Id = dtClientes.getValueAt(fila, 0).toString();
+       
+        
+        showForId(Id);
+        jPanel1.setVisible(false);
+        
+        
+    }//GEN-LAST:event_dtClientesMouseClicked
+
+    private void txtShowForIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtShowForIdKeyPressed
+        String texto = txtShowForId.getText();
+        if (!texto.equals("Ingrese Id Cliente") && !texto.isEmpty()) {
+            jPanel1.setVisible(true);
+        } else {
+            jPanel1.setVisible(false);
+        }
+        
+        
+        
+        toList();
+    }//GEN-LAST:event_txtShowForIdKeyPressed
+
+    private void txtShowForIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShowForIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtShowForIdActionPerformed
+
+    private void btnSearchForIdClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchForIdClientActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSearchForIdClientActionPerformed
+
     
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrmNewClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrmNewClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrmNewClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrmNewClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
       
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -302,10 +519,15 @@ public void InsertNewClient(){
     }
     
     public void transparentButton(){
-        btnSearch.setOpaque(false);
-        btnSearch.setContentAreaFilled(false);
-        btnSearch.setBorderPainted(false);
-     }
+        btnSearchforNameClient.setOpaque(false);
+        btnSearchforNameClient.setContentAreaFilled(false);
+        btnSearchforNameClient.setBorderPainted(false);
+        
+        btnSearchForIdClient.setOpaque(false);
+        btnSearchForIdClient.setContentAreaFilled(false);
+        btnSearchForIdClient.setBorderPainted(false);
+    }
+    
     
     
 
@@ -314,24 +536,34 @@ public void InsertNewClient(){
     private javax.swing.JButton btnReturn1;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnSearchForIdClient;
+    private javax.swing.JButton btnSearchforNameClient;
     private javax.swing.JComboBox<String> cboType;
+    private javax.swing.JTable dtClientes;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblPhone3;
     private javax.swing.JLabel lblPhone5;
     private javax.swing.JLabel lblPhone6;
+    private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtIdenty;
-    private javax.swing.JTextField txtIngreseNombreCliente2;
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtPhone;
-    private javax.swing.JTextField txtRtn;
+    private javax.swing.JTextField txtRTN;
+    private javax.swing.JTextField txtShowForId;
+    private javax.swing.JTextField txtShowForName;
     // End of variables declaration//GEN-END:variables
 }
