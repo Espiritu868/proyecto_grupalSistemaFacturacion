@@ -41,6 +41,8 @@ private void toList(){
             dataClient[1] = rs.getString("Client");
             dataClient[2] = rs.getString("Identity");
             dataClient[3] = rs.getString("Phone");
+           
+            
             
             
             modelo.addRow(dataClient);
@@ -72,7 +74,7 @@ private void showForId(String Id){
             txtId.setText(rs.getString("IdClient"));
             txtName.setText(rs.getString("Client"));
             txtPhone.setText(rs.getString("Phone"));
-            txtDireccion.setText(rs.getString("Direction"));
+            txtDireccion.setText(rs.getString("Adress"));
             txtRTN.setText(rs.getString("RTN"));
             txtIdenty.setText(rs.getString("Identity")); 
             cboType.setSelectedItem(rs.getString("Type"));
@@ -94,7 +96,7 @@ public void InsertNewClient(){
 
         String name = txtName.getText();
         String phone = txtPhone.getText();
-        String direction = txtDireccion.getText();
+        String adress = txtDireccion.getText();
         String rtn = txtRTN.getText();
         String identy = txtIdenty.getText();
         String type = String.valueOf(cboType.getSelectedItem());
@@ -104,12 +106,12 @@ public void InsertNewClient(){
         
 
         con = conn.getConexion();
-        String sql = "INSERT INTO dbaddclient (Client, Phone, RTN, Identity, Type) VALUES (?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO dbaddclient (Client, Phone, Adress, RTN, Identity, Type) VALUES (?, ?, ?, ?, ?,?)";
         ps = con.prepareStatement(sql);
 
         ps.setString(1, name);   
         ps.setString(2, phone); 
-        ps.setString(3, direction);
+        ps.setString(3, adress);
         ps.setString(4, rtn);
         ps.setString(5, identy);
         ps.setString(6, type);
@@ -176,7 +178,6 @@ public void InsertNewClient(){
         jLabel6 = new javax.swing.JLabel();
         txtDireccion = new javax.swing.JTextField();
         cboType = new javax.swing.JComboBox<>();
-        btnSearch = new javax.swing.JButton();
         lblPhone6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         txtPhone = new javax.swing.JTextField();
@@ -186,12 +187,18 @@ public void InsertNewClient(){
         txtShowForName = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         txtRTN = new javax.swing.JTextField();
+        btnEliminar = new javax.swing.JButton();
+        lblPhone7 = new javax.swing.JLabel();
+        lblPhone8 = new javax.swing.JLabel();
+        btnActualizar = new javax.swing.JButton();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        dtClientes.setBackground(new java.awt.Color(255, 255, 255));
+        dtClientes.setForeground(new java.awt.Color(0, 0, 0));
         dtClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -215,24 +222,18 @@ public void InsertNewClient(){
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 453, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 474, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 16, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 421, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 2, Short.MAX_VALUE))
         );
 
-        jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, 450, 80));
+        jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 340, 490, 60));
 
         jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\addclient 90x90.png")); // NOI18N
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, -1, -1));
@@ -270,16 +271,16 @@ public void InsertNewClient(){
 
         btnSave.setBackground(new java.awt.Color(255, 204, 51));
         btnSave.setForeground(new java.awt.Color(255, 204, 51));
-        btnSave.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
+        btnSave.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48pp.png")); // NOI18N
         btnSave.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnSave.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
-        btnSave.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\save64x64.png")); // NOI18N
+        btnSave.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48pp.png")); // NOI18N
+        btnSave.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
             }
         });
-        jPanel2.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 430, 80, 70));
+        jPanel2.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 410, 90, 80));
 
         jLabel3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -321,39 +322,39 @@ public void InsertNewClient(){
 
         btnReturn1.setBackground(new java.awt.Color(255, 204, 51));
         btnReturn1.setForeground(new java.awt.Color(255, 204, 51));
-        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
+        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
         btnReturn1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
-        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\Retur_72.png")); // NOI18N
+        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
+        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48.png")); // NOI18N
         btnReturn1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnReturn1ActionPerformed(evt);
             }
         });
-        jPanel2.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 430, 80, 70));
+        jPanel2.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, 90, 80));
 
         lblPhone3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone3.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone3.setText("REGRESAR");
-        jPanel2.add(lblPhone3, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 500, -1, -1));
+        jPanel2.add(lblPhone3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 490, -1, -1));
 
         btnClose1.setBackground(new java.awt.Color(255, 204, 51));
         btnClose1.setForeground(new java.awt.Color(255, 204, 51));
-        btnClose1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
+        btnClose1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
         btnClose1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnClose1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
-        btnClose1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_72.png")); // NOI18N
+        btnClose1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
+        btnClose1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50.png")); // NOI18N
         btnClose1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClose1ActionPerformed(evt);
             }
         });
-        jPanel2.add(btnClose1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 430, 80, 70));
+        jPanel2.add(btnClose1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 410, 90, 80));
 
         lblPhone5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
-        lblPhone5.setText("GUARDAR");
-        jPanel2.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 500, -1, -1));
+        lblPhone5.setText("ELIMINAR");
+        jPanel2.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 490, -1, 20));
 
         jLabel6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
@@ -368,16 +369,10 @@ public void InsertNewClient(){
         cboType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "        ", "PERSONA", "INSTITUCION", "EMPRESA" }));
         jPanel2.add(cboType, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 290, 170, -1));
 
-        btnSearch.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
-        btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnSearch.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
-        btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
-        jPanel2.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 430, 80, 70));
-
         lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone6.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone6.setText("CERRAR");
-        jPanel2.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 500, -1, -1));
+        jPanel2.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 490, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -422,6 +417,42 @@ public void InsertNewClient(){
 
         txtRTN.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel2.add(txtRTN, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 280, 170, -1));
+
+        btnEliminar.setBackground(java.awt.Color.orange);
+        btnEliminar.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48pp.png")); // NOI18N
+        btnEliminar.setToolTipText("");
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminar.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48pp.png")); // NOI18N
+        btnEliminar.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48.png")); // NOI18N
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 410, 90, 80));
+
+        lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone7.setText("GUARDAR");
+        jPanel2.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 490, -1, -1));
+
+        lblPhone8.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone8.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone8.setText("ACTUALIZAR");
+        jPanel2.add(lblPhone8, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 490, -1, -1));
+
+        btnActualizar.setBackground(java.awt.Color.orange);
+        btnActualizar.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
+        btnActualizar.setToolTipText("");
+        btnActualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnActualizar.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
+        btnActualizar.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48.png")); // NOI18N
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 410, 90, 80));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel2.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -508,6 +539,17 @@ public void InsertNewClient(){
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSearchForIdClientActionPerformed
 
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int file = dtClientes.getRowCount();
+        for (int i = file-1; i>=0; i--){
+            modelo.removeRow(i);
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
     
     public static void main(String args[]) {
       
@@ -532,10 +574,11 @@ public void InsertNewClient(){
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnClose1;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnReturn1;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSearchForIdClient;
     private javax.swing.JButton btnSearchforNameClient;
     private javax.swing.JComboBox<String> cboType;
@@ -557,6 +600,8 @@ public void InsertNewClient(){
     private javax.swing.JLabel lblPhone3;
     private javax.swing.JLabel lblPhone5;
     private javax.swing.JLabel lblPhone6;
+    private javax.swing.JLabel lblPhone7;
+    private javax.swing.JLabel lblPhone8;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtIdenty;

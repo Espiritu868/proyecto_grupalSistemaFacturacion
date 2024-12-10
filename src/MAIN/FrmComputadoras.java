@@ -70,7 +70,7 @@ private void showForId(String Id){
             txtIdCliente.setText(rs.getString("IdClient"));
             txtNombreCliente.setText(rs.getString("Client"));
             txtTelefono.setText(rs.getString("Phone"));
-            txtDireccion.setText(rs.getString("RTN"));
+            txtDireccion.setText(rs.getString("Diretion"));
 
         }
     } catch (Exception e) {

@@ -42,32 +42,24 @@
         <Container class="javax.swing.JPanel" name="jPanel1">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="260" y="340" width="450" height="80"/>
+              <AbsoluteConstraints x="280" y="340" width="490" height="60"/>
             </Constraint>
           </Constraints>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="453" max="32767" attributes="0"/>
-                  <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jScrollPane1" min="-2" pref="474" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="16" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="421" max="32767" attributes="0"/>
-                  <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jScrollPane1" min="-2" pref="58" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="2" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -82,6 +74,12 @@
               <SubComponents>
                 <Component class="javax.swing.JTable" name="dtClientes">
                   <Properties>
+                    <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                    </Property>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="0" green="0" red="0" type="rgb"/>
+                    </Property>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="4" rowCount="0">
                         <Column editable="true" title="ID" type="java.lang.Object"/>
@@ -224,16 +222,16 @@
               <Color blue="33" green="cc" red="ff" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\SAVE48X48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\SAVE48X48pp.png"/>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
             </Property>
             <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\SAVE48X48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\SAVE48X48pp.png"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\save64x64.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\SAVE48X48.png"/>
             </Property>
           </Properties>
           <Events>
@@ -241,7 +239,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="520" y="430" width="80" height="70"/>
+              <AbsoluteConstraints x="440" y="410" width="90" height="80"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -341,16 +339,16 @@
               <Color blue="33" green="cc" red="ff" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\return_48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\return48x48pp.png"/>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
             </Property>
             <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\return_48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\return48x48pp.png"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\Retur_72.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\return48x48.png"/>
             </Property>
           </Properties>
           <Events>
@@ -358,7 +356,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="260" y="430" width="80" height="70"/>
+              <AbsoluteConstraints x="180" y="410" width="90" height="80"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -374,7 +372,7 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="250" y="500" width="-1" height="-1"/>
+              <AbsoluteConstraints x="180" y="490" width="-1" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -387,16 +385,16 @@
               <Color blue="33" green="cc" red="ff" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\close_48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\cerrar 50x50pp.png"/>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
             </Property>
             <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\close_48.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\cerrar 50x50pp.png"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Internal Form Menu\close_72.png"/>
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\cerrar 50x50.png"/>
             </Property>
           </Properties>
           <Events>
@@ -404,7 +402,7 @@
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="390" y="430" width="80" height="70"/>
+              <AbsoluteConstraints x="310" y="410" width="90" height="80"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -416,11 +414,11 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="GUARDAR"/>
+            <Property name="text" type="java.lang.String" value="ELIMINAR"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="510" y="500" width="-1" height="-1"/>
+              <AbsoluteConstraints x="690" y="490" width="-1" height="20"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -476,27 +474,6 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JButton" name="btnSearch">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\search32x32.png"/>
-            </Property>
-            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-              <Color id="Hand Cursor"/>
-            </Property>
-            <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\search32x32.png"/>
-            </Property>
-            <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\search48x48.png"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="520" y="430" width="80" height="70"/>
-            </Constraint>
-          </Constraints>
-        </Component>
         <Component class="javax.swing.JLabel" name="lblPhone6">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -509,7 +486,7 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="390" y="500" width="-1" height="-1"/>
+              <AbsoluteConstraints x="320" y="490" width="-1" height="-1"/>
             </Constraint>
           </Constraints>
         </Component>
@@ -636,6 +613,94 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
               <AbsoluteConstraints x="610" y="280" width="170" height="-1"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnEliminar">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="c8" id="orange" palette="1" red="ff" type="palette"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\delete48x48pp.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+              <Color id="Hand Cursor"/>
+            </Property>
+            <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\delete48x48pp.png"/>
+            </Property>
+            <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\delete48x48.png"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEliminarActionPerformed"/>
+          </Events>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="690" y="410" width="90" height="80"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblPhone7">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Exotc350 Bd BT" size="18" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="GUARDAR"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="440" y="490" width="-1" height="-1"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblPhone8">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Exotc350 Bd BT" size="18" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="ACTUALIZAR"/>
+          </Properties>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="550" y="490" width="-1" height="-1"/>
+            </Constraint>
+          </Constraints>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnActualizar">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="0" green="c8" id="orange" palette="1" red="ff" type="palette"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\refresh48x48pp.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+              <Color id="Hand Cursor"/>
+            </Property>
+            <Property name="pressedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\refresh48x48pp.png"/>
+            </Property>
+            <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="2" name="C:\Users\chave\OneDrive\Documentos\UTH\II Parcial\Programacion Orientada a Objetos\PROYECTO GRUPAL\PROYECTO_GRUPAL\Pictures\Iconos\refresh48x48.png"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnActualizarActionPerformed"/>
+          </Events>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+              <AbsoluteConstraints x="560" y="410" width="90" height="80"/>
             </Constraint>
           </Constraints>
         </Component>
