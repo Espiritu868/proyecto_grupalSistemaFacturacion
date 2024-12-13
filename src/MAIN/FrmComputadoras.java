@@ -16,130 +16,6 @@ import javax.swing.table.DefaultTableModel;
  * @author Ever Chavez
  */
 public class FrmComputadoras extends javax.swing.JFrame {
-    DefaultTableModel modelo;
-        
-    Conexion conn = new Conexion("proyecto_grupal");
-
-    private void toList(){
-    
-    Object dataClient[] = new Object[4];
-    modelo = (DefaultTableModel) dtClientes.getModel();
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    Statement st = null;
-    modelo.setRowCount(0);
-    
-    try {
-        con = conn.getConexion();
-        st = con.createStatement();
-        rs = st.executeQuery("select * from dbaddclient where Client like '%" + txtIngreseNombreCliente.getText() + "%'");
-        
-        while(rs.next()){
-            dataClient[0] = rs.getString("IdClient");
-            dataClient[1] = rs.getString("Client");
-            dataClient[2] = rs.getString("Phone");
-            dataClient[3] = rs.getString("Identity");
-            
-            
-            modelo.addRow(dataClient);
-            
-            dtClientes.setModel(modelo);
-            
-        }
-    } catch (Exception e) {
-        System.out.println("Error en la consulta.");
-    }
-        
-}   
-private void showForId(String Id){
-    
-   
-    Connection con = null;
- 
-    ResultSet rs = null;
-    Statement st = null;
-  
-    
-    try {
-        con = conn.getConexion();
-        st = con.createStatement();
-        rs = st.executeQuery("select * from dbaddclient where IdClient = '"+ Id +"'");
-        
-        while(rs.next()){
-            txtIdCliente.setText(rs.getString("IdClient"));
-            txtNombreCliente.setText(rs.getString("Client"));
-            txtTelefono.setText(rs.getString("Phone"));
-            txtDireccion.setText(rs.getString("Diretion"));
-
-        }
-    } catch (Exception e) {
-        System.out.println("Error en la consulta.");
-    }
-        
-}      
-    
-public void InsertNewComputer() {
-    Conexion conn = new Conexion("proyecto_grupal");
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    try {
-        // Obtener datos de los campos
-        String model = String.valueOf(cboModelo.getSelectedItem());
-        String serviceTag = txtServiceTag.getText();
-        String charger = String.valueOf(cboCargador.getSelectedItem());
-        String maletin = String.valueOf(cboMaletin.getSelectedItem());
-        String other = String.valueOf(cboOtros.getSelectedItem());
-        String password = txtPassword.getText();
-        Integer coste = Integer.parseInt(txtCosto.getText());
-        Integer advance = Integer.parseInt(txtAnticipo.getText());
-        Integer end = Integer.parseInt(txtFinal.getText());
-        String equipmentProblem = txtProblem.getText();
-        String diagnostic = txtDiagnostic.getText();
-
-        // Conexión a la base de datos
-        con = conn.getConexion();
-        String sql = "INSERT INTO dbcomputers (Model, ServiceTag, Briegcase, Charger, Other, Password, Coste, Advance, End, EquipmentProblem, Diagnostic) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-        ps = con.prepareStatement(sql);
-
-        // Configurar los parámetros de la consulta
-        ps.setString(1, model);
-        ps.setString(2, serviceTag);
-        ps.setString(3, maletin);
-        ps.setString(4, charger);
-        ps.setString(5, other);
-        ps.setString(6, password);
-        ps.setInt(7, coste);
-        ps.setInt(8, advance);
-        ps.setInt(9, end);
-        ps.setString(10, equipmentProblem);
-        ps.setString(11, diagnostic);
-
-        // Ejecutar la consulta y verificar inserción
-        int rowsInserted = ps.executeUpdate();
-
-        if (rowsInserted > 0) {
-            JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
-            toList(); // Actualizar lista de datos
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Verifique los campos numéricos (anticipo y final).", "Error", JOptionPane.ERROR_MESSAGE);
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
-
         
     public FrmComputadoras() {
         initComponents();
@@ -147,23 +23,316 @@ public void InsertNewComputer() {
         transparentButton();
         toList();
         jPanel2.setVisible(false);
-        dtClientes.setVisible(false);
-        
+        panel1.setVisible(false);       
     }
+    
+    DefaultTableModel modelo;
+        
+    Conexion conn = new Conexion("proyecto");
+    String mensaje = "";
+    
+        public void mostrarInicio(){
+                FrmInicio open = new FrmInicio();
+
+                open.setVisible(true);
+                this.setVisible(false);
+            }
+        public void InsertNewComputer() {
+            // Crear una instancia de Conexion para conectar con la base de datos
+            Conexion conn = new Conexion("proyecto");  // "proyecto" es el nombre de tu base de datos
+
+            // Obtener la conexión usando el método getConexion
+            Connection con = conn.getConexion();
+
+            // Verificar si la conexión es válida
+            if (con == null) {
+                JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;  // Salir si la conexión no es válida
+            }
+
+            PreparedStatement ps = null;
+
+            try {
+                // Capturar y validar los valores de los componentes
+                String idClient = txtIdentidadCliente.getText().trim();  // Obtener idClient
+                String name = txtNombreCliente.getText().trim();
+                String phone = txtTelefono.getText().trim();
+                String adress = txtDireccion.getText().trim();
+                String model = String.valueOf(cboModelo.getSelectedItem()).trim();
+                String serviceTag = txtServiceTag.getText().trim();
+                String maletin = String.valueOf(cboMaletin.getSelectedItem()).trim();
+                String cargador = String.valueOf(cboCargador.getSelectedItem()).trim();
+                String other = String.valueOf(cboOtros.getSelectedItem()).trim();
+                String contrasenia = txtPassword.getText().trim();
+
+                // Validar campos numéricos
+                Integer costo = Integer.parseInt(txtCosto.getText().trim());
+                Integer anticipo = Integer.parseInt(txtAnticipo.getText().trim());
+                Integer pendiente = Integer.parseInt(txtFinal.getText().trim());
+
+                String problema = txtProblem.getText().trim();
+                String diagnostico = txtDiagnostic.getText().trim();
+
+                // Validar campos obligatorios
+                if (name.isEmpty() || phone.isEmpty() || adress.isEmpty() || model.isEmpty() || serviceTag.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, llena todos los campos obligatorios.");
+                    return;
+                }
+
+                // Preparar la consulta SQL (sin incluir 'id' ya que es autoincrementable)
+                String sql = "INSERT INTO computadoras (idClient, clientName, phoneClient, adressClient, model, serviceTag, briegcase, charger, other, password, coste, anticipo, final, equipmentProblem, diagnostic) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+                ps = con.prepareStatement(sql);
+
+                // Asignar valores a los parámetros
+                ps.setString(1, idClient);  // Asignar el valor de idClient
+                ps.setString(2, name);
+                ps.setString(3, phone);
+                ps.setString(4, adress);
+                ps.setString(5, model);
+                ps.setString(6, serviceTag);
+                ps.setString(7, maletin);
+                ps.setString(8, cargador);
+                ps.setString(9, other);
+                ps.setString(10, contrasenia);
+                ps.setInt(11, costo);
+                ps.setInt(12, anticipo);
+                ps.setInt(13, pendiente);
+                ps.setString(14, problema);
+                ps.setString(15, diagnostico);
+
+                // Ejecutar la consulta
+                int rowsInserted = ps.executeUpdate();
+
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+                    toList(); // Refrescar la lista
+                    mostrarInicio();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (ps != null) ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    
+
+
+
+        public void buscarCliente(){
+
+            Object dataClient[] = new Object[4];
+            modelo = (DefaultTableModel) dtClientes.getModel();
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            Statement st = null;
+            modelo.setRowCount(0);
+
+            try {
+                con = conn.getConexion();
+                st = con.createStatement();
+                rs = st.executeQuery("select * from clientes where clientName like '%" + txtIngreseNombreCliente.getText() + "%'");
+
+                while(rs.next()){
+                    dataClient[0] = rs.getString("id");
+                    dataClient[1] = rs.getString("clientName");
+                    dataClient[2] = rs.getString("idClient");
+                    dataClient[3] = rs.getString("adressClient");
+
+                    modelo.addRow(dataClient);
+
+                    dtClientes.setModel(modelo);
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error en la consulta. problema en BuscarCliente");
+            }
+
+        }  
+        
+        public void mostrarCliente(String Id) {
+            Connection con = null;
+            ResultSet rs = null;
+            PreparedStatement pst = null;
+
+            try {
+                // Obtener conexión
+                con = conn.getConexion();
+
+                // Consulta SQL para buscar cliente por id
+                String consulta = "SELECT * FROM clientes WHERE id = ?"; // Uso de ? para seguridad
+
+                // Crear el PreparedStatement
+                pst = con.prepareStatement(consulta);
+
+                // Establecer el parámetro de la consulta
+                pst.setString(1, Id.trim()); // Usar .trim() para eliminar espacios si es necesario
+
+                // Ejecutar la consulta
+                rs = pst.executeQuery();
+
+                // Comprobar si se encontraron datos
+                if (rs.next()) {
+                    // Asignar los datos a los campos correspondientes
+                    txtIdentidadCliente.setText(rs.getString("idClient"));
+                    txtNombreCliente.setText(rs.getString("clientName"));
+                    txtTelefono.setText(rs.getString("phoneClient"));
+                    txtDireccion.setText(rs.getString("adressClient"));
+
+                } else {
+                    // En caso de que no se encuentren resultados
+                    JOptionPane.showMessageDialog(null, "No se encontraron datos para el cliente con el ID proporcionado.");
+                    System.out.println("No se encontraron datos para el ID: " + Id);
+                }
+            } catch (Exception e) {
+                // Manejo de excepciones
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (rs != null) rs.close();
+                    if (pst != null) pst.close();
+                    if (con != null) con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    
+
+
+        
 
     
+       public void buscarEquipoCliente() {
+    // Crear una instancia de Conexion para conectar con la base de datos
+    Conexion conn = new Conexion("proyecto"); // "proyecto" es el nombre de tu base de datos
+
+    // Obtener la conexión usando el método getConexion
+    Connection con = conn.getConexion();
+
+    // Verificar si la conexión es válida
+    if (con == null) {
+        JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+        return; // Salir si la conexión no es válida
+    }
+
+    Object[] dataClient = new Object[5];
+    modelo = (DefaultTableModel) tblEquipoCliente.getModel();
+    modelo.setRowCount(0); // Limpiar tabla antes de agregar nuevas filas
+
+    String query = "SELECT id, model, clientName, equipmentProblem, idClient " +
+                   "FROM computadoras WHERE clientName LIKE ?";
+
+    try (PreparedStatement ps = con.prepareStatement(query)) {
+        // Configurar el parámetro de la consulta
+        ps.setString(1, "%" + txtBuscarEquipoCliente.getText() + "%");
+
+        try (ResultSet rs = ps.executeQuery()) {
+            // Procesar los resultados de la consulta
+            while (rs.next()) {
+                dataClient[0] = rs.getString("id");
+                dataClient[1] = rs.getString("model");
+                dataClient[2] = rs.getString("clientName");
+                dataClient[3] = rs.getString("equipmentProblem");
+                dataClient[4] = rs.getString("idClient");
+                
+                modelo.addRow(dataClient);
+            }
+        }
+
+        // Actualizar el modelo de la tabla
+        tblEquipoCliente.setModel(modelo);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al buscar equipo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+
+        
+        public void mostrarEquipo(String Identificador){
+    
+   
+        Connection con = null;
+
+        ResultSet rs = null;
+        Statement st = null;
+
+
+        try {
+            con = conn.getConexion();
+            st = con.createStatement();
+            rs = st.executeQuery("select * from computadoras where id = '"+ Identificador +"'");
+
+        while(rs.next()){
+
+                    // Asignar valores a los componentes
+                    txtIdCliente.setText(rs.getString("id"));
+                    txtIdentidadCliente.setText(rs.getString("idClient"));
+                    txtNombreCliente.setText(rs.getString("clientName"));
+                    txtTelefono.setText(rs.getString("phoneClient"));
+                    txtDireccion.setText(rs.getString("adressClient"));
+                    cboModelo.setSelectedItem(rs.getString("model"));
+                    txtServiceTag.setText(rs.getString("serviceTag"));
+                    cboMaletin.setSelectedItem(rs.getString("briegcase"));
+                    cboCargador.setSelectedItem(rs.getString("charger"));
+                    cboOtros.setSelectedItem(rs.getString("other"));
+                    txtPassword.setText(rs.getString("password"));
+                    int coste = rs.getInt("coste");
+                    if (!rs.wasNull()) {
+                        txtCosto.setText(String.valueOf(coste));
+                    } else {
+                        txtCosto.setText(""); // O algún valor predeterminado
+                    }
+                    int anticipo = rs.getInt("anticipo");
+                    if (!rs.wasNull()) {
+                        txtAnticipo.setText(String.valueOf(anticipo));
+                    } else {
+                        txtAnticipo.setText(""); // O algún valor predeterminado
+                    }
+                    int pendiente = rs.getInt("final");
+                    if (!rs.wasNull()) {
+                        txtFinal.setText(String.valueOf(pendiente));
+                    } else {
+                        txtFinal.setText(""); // O algún valor predeterminado
+                    }
+                    txtProblem.setText(rs.getString("equipmentProblem"));
+                    txtDiagnostic.setText(rs.getString("diagnostic"));
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error en la consulta. Error en funcion MostrarEquipo.");
+        }
+        
+
+        }
+        
+        
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        panel1 = new java.awt.Panel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblEquipoCliente = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         dtClientes = new javax.swing.JTable();
         btnSearchEquip = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
         txtNombreCliente = new javax.swing.JTextField();
-        txtShowForId = new javax.swing.JTextField();
+        txtBuscarEquipoCliente = new javax.swing.JTextField();
         lblNombreCliente = new javax.swing.JLabel();
         lblDireccion = new javax.swing.JLabel();
         txtPassword = new javax.swing.JTextField();
@@ -200,6 +369,8 @@ public void InsertNewComputer() {
         lblDireccion1 = new javax.swing.JLabel();
         lblDireccion2 = new javax.swing.JLabel();
         txtServiceTag = new javax.swing.JTextField();
+        txtIdentidadCliente = new javax.swing.JTextField();
+        lblFecha = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -208,12 +379,58 @@ public void InsertNewComputer() {
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        tblEquipoCliente.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "EQUIPO", "NOMBRE", "DESCRIPCION", "FECHA"
+            }
+        ));
+        tblEquipoCliente.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEquipoClienteMouseClicked(evt);
+            }
+        });
+        tblEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblEquipoClienteKeyPressed(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblEquipoCliente);
+        if (tblEquipoCliente.getColumnModel().getColumnCount() > 0) {
+            tblEquipoCliente.getColumnModel().getColumn(0).setPreferredWidth(30);
+            tblEquipoCliente.getColumnModel().getColumn(1).setPreferredWidth(150);
+            tblEquipoCliente.getColumnModel().getColumn(2).setPreferredWidth(250);
+            tblEquipoCliente.getColumnModel().getColumn(3).setPreferredWidth(250);
+            tblEquipoCliente.getColumnModel().getColumn(4).setPreferredWidth(120);
+        }
+
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel1Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 910, 430));
+
         dtClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "ID", "NOMBRE", "TELEFONO", "DIRECCION"
+                "ID", "NOMBRE", "IDENTIDAD", "DIRECCION"
             }
         ));
         dtClientes.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -227,14 +444,17 @@ public void InsertNewComputer() {
             }
         });
         jScrollPane1.setViewportView(dtClientes);
+        if (dtClientes.getColumnModel().getColumnCount() > 0) {
+            dtClientes.getColumnModel().getColumn(0).setPreferredWidth(15);
+            dtClientes.getColumnModel().getColumn(1).setPreferredWidth(200);
+            dtClientes.getColumnModel().getColumn(3).setPreferredWidth(200);
+        }
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,7 +463,7 @@ public void InsertNewComputer() {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 460, 70));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 620, 70));
 
         btnSearchEquip.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchEquip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -275,8 +495,23 @@ public void InsertNewComputer() {
         });
         jPanel1.add(txtNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 70, 360, -1));
 
-        txtShowForId.setText("Buscar Id Cliente");
-        jPanel1.add(txtShowForId, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, 270, -1));
+        txtBuscarEquipoCliente.setText("Buscar Equipo Cliente");
+        txtBuscarEquipoCliente.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtBuscarEquipoClienteMouseClicked(evt);
+            }
+        });
+        txtBuscarEquipoCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarEquipoClienteActionPerformed(evt);
+            }
+        });
+        txtBuscarEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscarEquipoClienteKeyPressed(evt);
+            }
+        });
+        jPanel1.add(txtBuscarEquipoCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, 270, -1));
 
         lblNombreCliente.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblNombreCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -459,9 +694,13 @@ public void InsertNewComputer() {
         lblDireccion2.setText("Service Tag");
         jPanel1.add(lblDireccion2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, -1, -1));
         jPanel1.add(txtServiceTag, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 160, 110, -1));
+        jPanel1.add(txtIdentidadCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 80, -1));
+
+        lblFecha.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        lblFecha.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(lblFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 20, 70, 30));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
-        lblBackground.setText("jLabel1");
         jPanel1.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -474,7 +713,7 @@ public void InsertNewComputer() {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -490,10 +729,7 @@ public void InsertNewComputer() {
     }//GEN-LAST:event_txtNombreClienteActionPerformed
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
-        FrmInicio open = new FrmInicio();
-
-        open.setVisible(true);
-        this.setVisible(false);
+        mostrarInicio();
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnClose2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose2ActionPerformed
@@ -503,21 +739,24 @@ public void InsertNewComputer() {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         InsertNewComputer();
         
+        if (mensaje == "¡Datos insertados exitosamente!"){
         FrmInicio open = new FrmInicio();
         open.setVisible(true);
-        this.setVisible(false);
+        this.setVisible(false);}
+        
+        
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void cboModeloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboModeloActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_cboModeloActionPerformed
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnSearchEquipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchEquipActionPerformed
@@ -525,26 +764,19 @@ public void InsertNewComputer() {
     }//GEN-LAST:event_btnSearchEquipActionPerformed
 
     private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
-        int fila =  dtClientes.getSelectedRow();
-        String Id = dtClientes.getValueAt(fila, 0).toString();
-       
-        
-        showForId(Id);
-                                       
-    // Verifica si se seleccionó alguna fila
-    int selectedRow = dtClientes.getSelectedRow();
-    if (selectedRow != -1) { // -1 significa que no hay fila seleccionada
-        jPanel2.setVisible(false);
-        dtClientes.setVisible(false);
-    }
+    int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
+    String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
+
+    System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
+
+    mostrarCliente(id);  // Pasar el id al método mostrarCliente
+    jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
     }//GEN-LAST:event_dtClientesMouseClicked
 
     private void txtIngreseNombreClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIngreseNombreClienteKeyPressed
-        String texto = txtIngreseNombreCliente.getText();
-        if ( texto != " Ingrese Nombre Cliente"){
-        dtClientes.setVisible(true);
-        jPanel2.setVisible(true);}
-        toList();
+        jPanel2.setVisible(true);
+        buscarCliente();
+        
     }//GEN-LAST:event_txtIngreseNombreClienteKeyPressed
 
     private void txtIngreseNombreClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIngreseNombreClienteActionPerformed
@@ -552,9 +784,34 @@ public void InsertNewComputer() {
     }//GEN-LAST:event_txtIngreseNombreClienteActionPerformed
 
     private void dtClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dtClientesKeyPressed
-        jPanel2.setVisible(false);
-        dtClientes.setVisible(false);
+
     }//GEN-LAST:event_dtClientesKeyPressed
+
+    private void txtBuscarEquipoClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteActionPerformed
+
+    }//GEN-LAST:event_txtBuscarEquipoClienteActionPerformed
+
+    private void txtBuscarEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteKeyPressed
+        panel1.setVisible(true);
+        buscarEquipoCliente();
+    }//GEN-LAST:event_txtBuscarEquipoClienteKeyPressed
+
+    private void txtBuscarEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteMouseClicked
+
+    }//GEN-LAST:event_txtBuscarEquipoClienteMouseClicked
+
+    private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
+
+    }//GEN-LAST:event_tblEquipoClienteKeyPressed
+
+    private void tblEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoClienteMouseClicked
+
+        int fila =  tblEquipoCliente.getSelectedRow();
+        String Identificador = tblEquipoCliente.getValueAt(fila, 0).toString();
+        mostrarEquipo(Identificador);
+        panel1.setVisible(false);
+
+    }//GEN-LAST:event_tblEquipoClienteMouseClicked
     
     public void transparentButton(){
         btnSearch.setOpaque(false);
@@ -618,11 +875,13 @@ public void InsertNewComputer() {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblCargador;
     private javax.swing.JLabel lblDireccion;
     private javax.swing.JLabel lblDireccion1;
     private javax.swing.JLabel lblDireccion2;
+    private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblMaletin;
     private javax.swing.JLabel lblModelo;
     private javax.swing.JLabel lblNombreCliente;
@@ -636,18 +895,21 @@ public void InsertNewComputer() {
     private javax.swing.JLabel lblServiceTag5;
     private javax.swing.JLabel lblServiceTag6;
     private javax.swing.JLabel lblTelefono;
+    private java.awt.Panel panel1;
+    private javax.swing.JTable tblEquipoCliente;
     private javax.swing.JTextField txtAnticipo;
+    private javax.swing.JTextField txtBuscarEquipoCliente;
     private javax.swing.JTextField txtCosto;
     private javax.swing.JTextField txtDiagnostic;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtFinal;
     private javax.swing.JTextField txtIdCliente;
+    private javax.swing.JTextField txtIdentidadCliente;
     private javax.swing.JTextField txtIngreseNombreCliente;
     private javax.swing.JTextField txtNombreCliente;
     private javax.swing.JTextField txtPassword;
     private javax.swing.JTextField txtProblem;
     private javax.swing.JTextField txtServiceTag;
-    private javax.swing.JTextField txtShowForId;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,6 +4,8 @@ package MAIN;
 import java.sql.*;
 import DAO.Conexion;
 import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static java.util.stream.Collectors.toList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,7 +18,7 @@ public class FrmNewClient extends javax.swing.JFrame {
     
     DefaultTableModel modelo;
         
-    Conexion conn = new Conexion("proyecto_grupal");
+    Conexion conn = new Conexion("proyecto");
 
     String mensaje; 
  
@@ -34,16 +36,14 @@ private void toList(){
     try {
         con = conn.getConexion();
         st = con.createStatement();
-        rs = st.executeQuery("select * from dbaddclient where Client like '%" + txtShowForName.getText() + "%'");
+        rs = st.executeQuery("select * from clientes where clientName like '%" + txtShowForName.getText() + "%'");
         
         while(rs.next()){
-            dataClient[0] = rs.getString("IdClient");
-            dataClient[1] = rs.getString("Client");
-            dataClient[2] = rs.getString("Identity");
-            dataClient[3] = rs.getString("Phone");
-           
-            
-            
+            dataClient[0] = rs.getString("id");
+            dataClient[1] = rs.getString("clientName");
+            dataClient[2] = rs.getString("idClient");
+            dataClient[3] = rs.getString("phoneClient");
+
             
             modelo.addRow(dataClient);
             
@@ -56,7 +56,7 @@ private void toList(){
         
 }   
 
-private void showForId(String Id){
+public void mostrarClienteNombre(String Id){
     
    
     Connection con = null;
@@ -68,16 +68,16 @@ private void showForId(String Id){
     try {
         con = conn.getConexion();
         st = con.createStatement();
-        rs = st.executeQuery("select * from dbaddclient where IdClient = '"+ Id +"'");
+        rs = st.executeQuery("select * from clientes where id = '"+ Id +"'");
         
         while(rs.next()){
-            txtId.setText(rs.getString("IdClient"));
-            txtName.setText(rs.getString("Client"));
-            txtPhone.setText(rs.getString("Phone"));
-            txtDireccion.setText(rs.getString("Adress"));
-            txtRTN.setText(rs.getString("RTN"));
-            txtIdenty.setText(rs.getString("Identity")); 
-            cboType.setSelectedItem(rs.getString("Type"));
+            txtId.setText(rs.getString("id"));
+            txtName.setText(rs.getString("clientName"));
+            txtPhone.setText(rs.getString("phoneClient"));
+            txtDireccion.setText(rs.getString("adressClient"));
+            txtRTN.setText(rs.getString("rtnClient"));
+            txtIdenty.setText(rs.getString("idClient")); 
+            cboType.setSelectedItem(rs.getString("typeClient"));
 
         }
     } catch (Exception e) {
@@ -88,48 +88,50 @@ private void showForId(String Id){
 
     
 
-public void InsertNewClient(){
+public void InsertNewClient() {
     Connection con = null;
     PreparedStatement ps = null;
 
     try {
+        // Capturar los valores de los campos de texto
+        String name = txtName.getText().trim();
+        String phone = txtPhone.getText().trim();
+        String adress = txtDireccion.getText().trim();
+        String rtn = txtRTN.getText().trim(); // Para idClient
+        String identy = txtIdenty.getText().trim(); // Para typeClient
+        String type = String.valueOf(cboType.getSelectedItem()).trim();
 
-        String name = txtName.getText();
-        String phone = txtPhone.getText();
-        String adress = txtDireccion.getText();
-        String rtn = txtRTN.getText();
-        String identy = txtIdenty.getText();
-        String type = String.valueOf(cboType.getSelectedItem());
-        
-        
+        // Validar el tamaño del RTN (idClient)
+        if (rtn.length() > 15) { // Ajusta este valor según tu base de datos
+            JOptionPane.showMessageDialog(this, "El valor de RTN excede el tamaño permitido (máx. 15 caracteres).", "Error", JOptionPane.ERROR_MESSAGE);
+            return; // Salir del método si el dato no es válido
+        }
 
-        
-
+        // Establecer la conexión con la base de datos
         con = conn.getConexion();
-        String sql = "INSERT INTO dbaddclient (Client, Phone, Adress, RTN, Identity, Type) VALUES (?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO clientes (clientName, phoneClient, adressClient, idClient, typeClient, rtnClient) VALUES (?, ?, ?, ?, ?, ?)";
         ps = con.prepareStatement(sql);
 
-        ps.setString(1, name);   
-        ps.setString(2, phone); 
+        // Asignar los valores a los parámetros de la consulta
+        ps.setString(1, name);
+        ps.setString(2, phone);
         ps.setString(3, adress);
-        ps.setString(4, rtn);
-        ps.setString(5, identy);
-        ps.setString(6, type);
-        
+        ps.setString(4, identy);
+        ps.setString(5, type);
+        ps.setString(6, rtn);
+
+        // Ejecutar la inserción y verificar el resultado
         int rowsInserted = ps.executeUpdate();
 
         if (rowsInserted > 0) {
-            mensaje = "¡Datos insertados exitosamente!";
-            JOptionPane.showMessageDialog(this, mensaje);
-            toList(); 
+            JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+            toList(); // Refrescar la lista si es necesario
         } else {
             JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
         }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "La Edad debe ser un número válido.");
     } catch (SQLException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos.");
+        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos.", "Error", JOptionPane.ERROR_MESSAGE);
     } finally {
         try {
             if (ps != null) ps.close();
@@ -137,18 +139,164 @@ public void InsertNewClient(){
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        }
     }
+}
+    public void buttonLock(){
+    dtClientes.getSelectionModel().addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) { // Asegurarse de que el evento no sea temporal
+            int selectedRow = dtClientes.getSelectedRow(); // Obtener la fila seleccionada
+            if (selectedRow != -1) {
+                btnSave.setEnabled(false); // Deshabilitar el botón si hay una fila seleccionada
+            } else {
+                btnSave.setEnabled(true); // Habilitar el botón si no hay selección
+            }
+        }
+    });
+    
+    btnActualizar.setEnabled(false);
 
+    // Listener para habilitar/deshabilitar btnActualizar según la selección en la tabla
+    dtClientes.getSelectionModel().addListSelectionListener(e -> {
+        if (!e.getValueIsAdjusting()) {
+            int selectedRow = dtClientes.getSelectedRow();
+            if (selectedRow != -1) {
+                btnActualizar.setEnabled(true); // Habilitar el botón si hay una fila seleccionada
+            } else {
+                btnActualizar.setEnabled(false); // Deshabilitar el botón si no hay selección
+            }
+        }
+    });
+    }
    
     public FrmNewClient() {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        buttonLock();
         
         toList();
         jPanel1.setVisible(false);
+
         
+    }
+    
+    public void ModificarNewClient(){
+
+        Connection con = null;
+    PreparedStatement ps = null;
+
+    try {
+
+            String name = txtName.getText();
+            String phone = txtPhone.getText();
+            String adress = txtDireccion.getText();
+            String rtn = txtRTN.getText();
+            String identy = txtIdenty.getText();
+            String type = String.valueOf(cboType.getSelectedItem());
+
+
+            int idClient = Integer.parseInt(txtId.getText());
+
+
+            con = conn.getConexion();
+
+
+            String sql = "UPDATE clientes SET clientName = ?, phoneClient = ?, adressClient = ?, rtnClient = ?, idClient = ?, typeClient = ? WHERE id = ?";
+            ps = con.prepareStatement(sql);
+
+
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, adress);
+            ps.setString(4, rtn);
+            ps.setString(5, identy);
+            ps.setString(6, type);
+            ps.setInt(7, idClient); 
+
+
+            int rowsUpdated = ps.executeUpdate();
+
+
+            if (rowsUpdated > 0) {
+                JOptionPane.showMessageDialog(this, "¡Datos actualizados exitosamente!");
+                toList(); 
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró el registro a actualizar.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Ocurrió un error al actualizar los datos: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El ID debe ser un número válido.");
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public void deleteClient (){
+    
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            // Obtener la fila seleccionada
+            int selectedRow = dtClientes.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecciona un cliente para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return; // Salir si no hay selección
+            }
+
+            // Obtener el ID del cliente seleccionado desde la tabla
+            int idClient = Integer.parseInt(dtClientes.getValueAt(selectedRow, 0).toString()); // Suponiendo que el ID está en la primera columna
+
+            // Confirmar la eliminación
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este cliente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return; // Salir si el usuario no confirma
+            }
+
+            // Conexión a la base de datos
+            con = conn.getConexion();
+
+            // Consulta SQL para eliminar
+            String sql = "DELETE FROM clientes WHERE idClient = ?";
+            ps = con.prepareStatement(sql);
+
+            // Asignar el valor del ID al parámetro
+            ps.setInt(1, idClient);
+
+            // Ejecutar la consulta
+            int rowsDeleted = ps.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                JOptionPane.showMessageDialog(this, "¡Cliente eliminado exitosamente!");
+                
+                toList(); // Actualizar la tabla
+                FrmInicio open = new FrmInicio();
+                open.setVisible(true);
+                this.setVisible(false);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró el cliente a eliminar.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Ocurrió un error al eliminar el cliente: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El ID del cliente debe ser un número válido.");
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     
@@ -214,8 +362,10 @@ public void InsertNewClient(){
         });
         jScrollPane1.setViewportView(dtClientes);
         if (dtClientes.getColumnModel().getColumnCount() > 0) {
-            dtClientes.getColumnModel().getColumn(0).setPreferredWidth(30);
+            dtClientes.getColumnModel().getColumn(0).setMinWidth(15);
+            dtClientes.getColumnModel().getColumn(0).setPreferredWidth(15);
             dtClientes.getColumnModel().getColumn(1).setPreferredWidth(300);
+            dtClientes.getColumnModel().getColumn(2).setMinWidth(180);
         }
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -223,17 +373,15 @@ public void InsertNewClient(){
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 474, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 16, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 649, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 2, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
         );
 
-        jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 340, 490, 60));
+        jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 320, 650, 70));
 
         jLabel2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\addclient 90x90.png")); // NOI18N
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, -1, -1));
@@ -280,7 +428,7 @@ public void InsertNewClient(){
                 btnSaveActionPerformed(evt);
             }
         });
-        jPanel2.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 410, 90, 80));
+        jPanel2.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 410, 90, 80));
 
         jLabel3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -331,12 +479,12 @@ public void InsertNewClient(){
                 btnReturn1ActionPerformed(evt);
             }
         });
-        jPanel2.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, 90, 80));
+        jPanel2.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 410, 90, 80));
 
         lblPhone3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone3.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone3.setText("REGRESAR");
-        jPanel2.add(lblPhone3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 490, -1, -1));
+        jPanel2.add(lblPhone3, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 490, -1, -1));
 
         btnClose1.setBackground(new java.awt.Color(255, 204, 51));
         btnClose1.setForeground(new java.awt.Color(255, 204, 51));
@@ -349,12 +497,12 @@ public void InsertNewClient(){
                 btnClose1ActionPerformed(evt);
             }
         });
-        jPanel2.add(btnClose1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 410, 90, 80));
+        jPanel2.add(btnClose1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 410, 90, 80));
 
         lblPhone5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone5.setText("ELIMINAR");
-        jPanel2.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 490, -1, 20));
+        jPanel2.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 490, -1, 20));
 
         jLabel6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
@@ -372,7 +520,7 @@ public void InsertNewClient(){
         lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone6.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone6.setText("CERRAR");
-        jPanel2.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 490, -1, -1));
+        jPanel2.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 490, -1, -1));
 
         jLabel7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -402,6 +550,16 @@ public void InsertNewClient(){
         txtShowForName.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         txtShowForName.setText("Ingrese Nombre Cliente");
         txtShowForName.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        txtShowForName.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtShowForNameMouseClicked(evt);
+            }
+        });
+        txtShowForName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtShowForNameActionPerformed(evt);
+            }
+        });
         txtShowForName.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtShowForNameKeyPressed(evt);
@@ -429,17 +587,17 @@ public void InsertNewClient(){
                 btnEliminarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 410, 90, 80));
+        jPanel2.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 410, 90, 80));
 
         lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone7.setText("GUARDAR");
-        jPanel2.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 490, -1, -1));
+        jPanel2.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 490, -1, -1));
 
         lblPhone8.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone8.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone8.setText("ACTUALIZAR");
-        jPanel2.add(lblPhone8, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 490, -1, -1));
+        jPanel2.add(lblPhone8, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 490, -1, -1));
 
         btnActualizar.setBackground(java.awt.Color.orange);
         btnActualizar.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
@@ -447,12 +605,17 @@ public void InsertNewClient(){
         btnActualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnActualizar.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
         btnActualizar.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48.png")); // NOI18N
+        btnActualizar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnActualizarMouseClicked(evt);
+            }
+        });
         btnActualizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnActualizarActionPerformed(evt);
             }
         });
-        jPanel2.add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 410, 90, 80));
+        jPanel2.add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 410, 90, 80));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel2.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -489,10 +652,20 @@ public void InsertNewClient(){
         FrmInicio open = new FrmInicio();
         open.setVisible(true);
         this.setVisible(false);}
+        
+        String texto = txtShowForName.getText();
+        if (texto != ("Ingrese Nombre Cliente")) {
+            // Habilitar el botón
+        } else {  
+            btnSave.setEnabled(false); // Deshabilitar el botón
+        }
     }//GEN-LAST:event_btnSaveActionPerformed
-
+    
+    
+    
     private void btnSearchforNameClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchforNameClientActionPerformed
-        toList();
+        
+
     }//GEN-LAST:event_btnSearchforNameClientActionPerformed
 
     private void txtShowForNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtShowForNameKeyPressed
@@ -512,7 +685,7 @@ public void InsertNewClient(){
         String Id = dtClientes.getValueAt(fila, 0).toString();
        
         
-        showForId(Id);
+        mostrarClienteNombre(Id);
         jPanel1.setVisible(false);
         
         
@@ -522,6 +695,7 @@ public void InsertNewClient(){
         String texto = txtShowForId.getText();
         if (!texto.equals("Ingrese Id Cliente") && !texto.isEmpty()) {
             jPanel1.setVisible(true);
+            
         } else {
             jPanel1.setVisible(false);
         }
@@ -530,7 +704,9 @@ public void InsertNewClient(){
         
         toList();
     }//GEN-LAST:event_txtShowForIdKeyPressed
-
+    
+    
+    
     private void txtShowForIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShowForIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtShowForIdActionPerformed
@@ -540,15 +716,27 @@ public void InsertNewClient(){
     }//GEN-LAST:event_btnSearchForIdClientActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-
+        ModificarNewClient();
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        int file = dtClientes.getRowCount();
-        for (int i = file-1; i>=0; i--){
-            modelo.removeRow(i);
-        }
+        
+        deleteClient();
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnActualizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseClicked
+        btnSave.setVisible(false);
+    }//GEN-LAST:event_btnActualizarMouseClicked
+
+    private void txtShowForNameMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtShowForNameMouseClicked
+        
+
+
+    }//GEN-LAST:event_txtShowForNameMouseClicked
+
+    private void txtShowForNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShowForNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtShowForNameActionPerformed
 
     
     public static void main(String args[]) {

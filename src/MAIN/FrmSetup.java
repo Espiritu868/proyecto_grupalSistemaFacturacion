@@ -2,7 +2,13 @@
 package MAIN;
 
 
+import DAO.Conexion;
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import com.mysql.jdbc.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -17,8 +23,42 @@ public class FrmSetup extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        pUsers.setVisible(false);
         
     }
+    DefaultTableModel modelo;
+    Conexion conn = new Conexion("proyecto_grupal");
+    
+    private void toList(){
+        
+    Object dataClient[] = new Object[4];
+    modelo = (DefaultTableModel) tblUsers.getModel();
+    java.sql.Connection con = null;
+    java.sql.PreparedStatement ps = null;
+    java.sql.ResultSet rs = null;
+    Statement st = null;
+    modelo.setRowCount(0);
+    
+    try {
+        con = conn.getConexion();
+        st = con.createStatement();
+        rs = st.executeQuery("select * from dbusers ");
+        
+        while(rs.next()){
+            dataClient[0] = rs.getString("Id");
+            dataClient[1] = rs.getString("User");
+            dataClient[2] = rs.getString("Password"); 
+            modelo.addRow(dataClient);
+            
+            tblUsers.setModel(modelo);
+            
+        }
+    } catch (Exception e) {
+        System.out.println("Error en la consulta.");
+    }
+        
+}   
+
 
     
     @SuppressWarnings("unchecked")
@@ -36,6 +76,9 @@ public class FrmSetup extends javax.swing.JFrame {
         lblSairTech = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        pUsers = new java.awt.Panel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblUsers = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -106,6 +149,33 @@ public class FrmSetup extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("CONTRASEÑA");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, 140, -1));
+
+        tblUsers.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "User ", "Password"
+            }
+        ));
+        jScrollPane1.setViewportView(tblUsers);
+
+        javax.swing.GroupLayout pUsersLayout = new javax.swing.GroupLayout(pUsers);
+        pUsers.setLayout(pUsersLayout);
+        pUsersLayout.setHorizontalGroup(
+            pUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pUsersLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        pUsersLayout.setVerticalGroup(
+            pUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pUsersLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jPanel2.add(pUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 110, 290, 350));
 
         jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 940, -1));
@@ -209,8 +279,11 @@ public class FrmSetup extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblSairTech;
+    private java.awt.Panel pUsers;
     private javax.swing.JPasswordField pswrContrasenia;
+    private javax.swing.JTable tblUsers;
     private javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }
