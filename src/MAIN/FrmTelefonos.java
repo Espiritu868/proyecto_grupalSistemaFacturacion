@@ -4,9 +4,12 @@ package MAIN;
 import DAO.Conexion;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import static java.util.stream.Collectors.toList;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,83 +17,309 @@ import javax.swing.JOptionPane;
  */
 public class FrmTelefonos extends javax.swing.JFrame {
     
-    String mensaje; 
-    public void InsertNewPhone() {
-    Conexion conn = new Conexion("proyecto_grupal");
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    try {
-        // Obtener datos de los campos
-        String model = String.valueOf(cboModelo.getSelectedItem());
-        String imei = txtImei.getText();
-        String charger = String.valueOf(cboProtector.getSelectedItem());
-        String protector = String.valueOf(cboProtector.getSelectedItem());
-        String other = String.valueOf(cboOtros.getSelectedItem());
-        String password = txtContrasenia.getText();
-        Integer coste = Integer.parseInt(txtCosto.getText());
-        Integer advance = Integer.parseInt(txtAnticipo.getText());
-        Integer end = Integer.parseInt(txtPendiente.getText());
-        String equipmentProblem = txtProblem.getText();
-        String diagnostic = txtDiagnostic.getText();
-        
-
-        // Conexión a la base de datos
-        con = conn.getConexion();
-        String sql = "INSERT INTO dbphone (Model, Imei, Charger, Protect, Other, Password, Advance, Total, Final, EquipmentProblem, Diagnostic) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-        ps = con.prepareStatement(sql);
-
-        // Configurar los parámetros de la consulta
-        ps.setString(1, model);
-        ps.setString(2, imei);
-        ps.setString(3, charger);
-        ps.setString(4, protector);
-        ps.setString(5, other);
-        ps.setString(6, password);
-        ps.setInt(7, coste);
-        ps.setInt(8, advance);
-        ps.setInt(9, end);
-        ps.setString(10, equipmentProblem);
-        ps.setString(11, diagnostic);
-
-        // Ejecutar la consulta y verificar inserción
-        int rowsInserted = ps.executeUpdate();
-
-        if (rowsInserted > 0) {
-            mensaje =  "¡Datos insertados exitosamente!";
-            JOptionPane.showMessageDialog(this, mensaje);
-            toList(); // Actualizar lista de datos
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Verifique los campos numéricos (anticipo y final).", "Error", JOptionPane.ERROR_MESSAGE);
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
+    
     
     public FrmTelefonos() {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        jPanel2.setVisible(false);
+        panel1.setVisible(false);
     }
+    DefaultTableModel modelo;
+        
+    Conexion conn = new Conexion("proyecto");
+    String mensaje = "";
+    
+        public void mostrarInicio(){
+                    FrmInicio open = new FrmInicio();
 
+                    open.setVisible(true);
+                    this.setVisible(false);
+                }
+
+        public void buscarCliente(){
+
+            Object dataClient[] = new Object[4];
+            modelo = (DefaultTableModel) dtClientes.getModel();
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            Statement st = null;
+            modelo.setRowCount(0);
+
+            try {
+                con = conn.getConexion();
+                st = con.createStatement();
+                rs = st.executeQuery("select * from clientes where clientName like '%" + txtIngreseNombreCliente.getText() + "%'");
+
+                while(rs.next()){
+                    dataClient[0] = rs.getString("id");
+                    dataClient[1] = rs.getString("clientName");
+                    dataClient[2] = rs.getString("idClient");
+                    dataClient[3] = rs.getString("adressClient");
+
+                    modelo.addRow(dataClient);
+
+                    dtClientes.setModel(modelo);
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error en la consulta. problema en BuscarCliente");
+            }
+
+        }  
+        
+        public void mostrarCliente(String Id) {
+            Connection con = null;
+            ResultSet rs = null;
+            PreparedStatement pst = null;
+
+            try {
+                // Obtener conexión
+                con = conn.getConexion();
+
+                // Consulta SQL para buscar cliente por id
+                String consulta = "SELECT * FROM clientes WHERE id = ?"; // Uso de ? para seguridad
+
+                // Crear el PreparedStatement
+                pst = con.prepareStatement(consulta);
+
+                // Establecer el parámetro de la consulta
+                pst.setString(1, Id.trim()); // Usar .trim() para eliminar espacios si es necesario
+
+                // Ejecutar la consulta
+                rs = pst.executeQuery();
+
+                // Comprobar si se encontraron datos
+                if (rs.next()) {
+                    // Asignar los datos a los campos correspondientes
+                    txtIdentidadCliente.setText(rs.getString("idClient"));
+                    txtNombreCliente.setText(rs.getString("clientName"));
+                    txtTelefono.setText(rs.getString("phoneClient"));
+                    txtDireccion.setText(rs.getString("adressClient"));
+
+                } else {
+                    // En caso de que no se encuentren resultados
+                    JOptionPane.showMessageDialog(null, "No se encontraron datos para el cliente con el ID proporcionado.");
+                    System.out.println("No se encontraron datos para el ID: " + Id);
+                }
+            } catch (Exception e) {
+                // Manejo de excepciones
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (rs != null) rs.close();
+                    if (pst != null) pst.close();
+                    if (con != null) con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        public void InsertNewPhone() {
+            // Crear una instancia de Conexion para conectar con la base de datos
+            Conexion conn = new Conexion("proyecto");  // "proyecto" es el nombre de tu base de datos
+
+            // Obtener la conexión usando el método getConexion
+            Connection con = conn.getConexion();
+
+            // Verificar si la conexión es válida
+            if (con == null) {
+                JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;  // Salir si la conexión no es válida
+            }
+
+            PreparedStatement ps = null;
+
+            try {
+                // Capturar y validar los valores de los componentes
+                String idClient = txtIdentidadCliente.getText().trim();  // Obtener idClient
+                String name = txtNombreCliente.getText().trim();
+                String phone = txtTelefono.getText().trim();
+                String adress = txtDireccion.getText().trim();
+                String model = String.valueOf(cboModelo.getSelectedItem()).trim();
+                String imei = txtImei.getText().trim();
+                String protector = String.valueOf(cboProtector.getSelectedItem()).trim();
+                String cargador = String.valueOf(cboCargador.getSelectedItem()).trim();
+                String other = String.valueOf(cboOtros.getSelectedItem()).trim();
+                String contrasenia = txtPassword.getText().trim();
+
+                // Validar campos numéricos
+                Integer costo = Integer.parseInt(txtCosto.getText().trim());
+                Integer anticipo = Integer.parseInt(txtAnticipo.getText().trim());
+                Integer pendiente = Integer.parseInt(txtPendiente.getText().trim());
+
+                String problema = txtProblem.getText().trim();
+                String diagnostico = txtDiagnostic.getText().trim();
+
+                // Validar campos obligatorios
+                if (name.isEmpty() || phone.isEmpty() || adress.isEmpty() || model.isEmpty() || imei.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, llena todos los campos obligatorios.");
+                    return;
+                }
+
+                // Preparar la consulta SQL (sin incluir 'id' ya que es autoincrementable)
+                String sql = "INSERT INTO telefonos (idClient, clientName, phoneClient, adressClient, model, imei, charger, protector, other, password, coste, anticipo, pendiente, equipmentProblem, diagnostic) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+                ps = con.prepareStatement(sql);
+
+                // Asignar valores a los parámetros
+                ps.setString(1, idClient);  // Asignar el valor de idClient
+                ps.setString(2, name);
+                ps.setString(3, phone);
+                ps.setString(4, adress);
+                ps.setString(5, model);
+                ps.setString(6, imei);
+                ps.setString(7, cargador);
+                ps.setString(8, protector);
+                ps.setString(9, other);
+                ps.setString(10, contrasenia);
+                ps.setInt(11, costo);
+                ps.setInt(12, anticipo);
+                ps.setInt(13, pendiente);
+                ps.setString(14, problema);
+                ps.setString(15, diagnostico);
+
+                // Ejecutar la consulta
+                int rowsInserted = ps.executeUpdate();
+
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+                    toList(); // Refrescar la lista
+                    mostrarInicio();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (ps != null) ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        public void buscarEquipoCliente() {
+            // Crear una instancia de Conexion para conectar con la base de datos
+            Conexion conn = new Conexion("proyecto"); // "proyecto" es el nombre de tu base de datos
+
+            // Obtener la conexión usando el método getConexion
+            Connection con = conn.getConexion();
+
+            // Verificar si la conexión es válida
+            if (con == null) {
+                JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Salir si la conexión no es válida
+            }
+
+            Object[] dataClient = new Object[5];
+            modelo = (DefaultTableModel) tblEquipoCliente.getModel();
+            modelo.setRowCount(0); // Limpiar tabla antes de agregar nuevas filas
+
+            String query = "SELECT id, model, clientName, equipmentProblem, idClient " +
+                           "FROM telefonos WHERE clientName LIKE ?";
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                // Configurar el parámetro de la consulta
+                ps.setString(1, "%" + txtBuscarEquipoCliente.getText() + "%");
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    // Procesar los resultados de la consulta
+                    while (rs.next()) {
+                        dataClient[0] = rs.getString("id");
+                        dataClient[1] = rs.getString("model");
+                        dataClient[2] = rs.getString("clientName");
+                        dataClient[3] = rs.getString("equipmentProblem");
+                        dataClient[4] = rs.getString("idClient");
+
+                        modelo.addRow(dataClient);
+                    }
+                }
+
+                // Actualizar el modelo de la tabla
+                tblEquipoCliente.setModel(modelo);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al buscar equipo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        public void mostrarEquipo(String Identificador){
+    
+   
+        Connection con = null;
+
+        ResultSet rs = null;
+        Statement st = null;
+
+
+        try {
+            con = conn.getConexion();
+            st = con.createStatement();
+            rs = st.executeQuery("select * from telefonos where id = '"+ Identificador +"'");
+
+        while(rs.next()){
+
+                    // Asignar valores a los componentes
+                    txtIdCliente.setText(rs.getString("id"));
+                    txtIdentidadCliente.setText(rs.getString("idClient"));
+                    txtNombreCliente.setText(rs.getString("clientName"));
+                    txtTelefono.setText(rs.getString("phoneClient"));
+                    txtDireccion.setText(rs.getString("adressClient"));
+                    cboModelo.setSelectedItem(rs.getString("model"));
+                    txtImei.setText(rs.getString("imei"));
+                    cboCargador.setSelectedItem(rs.getString("charger"));
+                    cboProtector.setSelectedItem(rs.getString("protector"));
+                    cboOtros.setSelectedItem(rs.getString("other"));
+                    txtPassword.setText(rs.getString("password"));
+                    int coste = rs.getInt("coste");
+                    if (!rs.wasNull()) {
+                        txtCosto.setText(String.valueOf(coste));
+                    } else {
+                        txtCosto.setText(""); // O algún valor predeterminado
+                    }
+                    int anticipo = rs.getInt("anticipo");
+                    if (!rs.wasNull()) {
+                        txtAnticipo.setText(String.valueOf(anticipo));
+                    } else {
+                        txtAnticipo.setText(""); // O algún valor predeterminado
+                    }
+                    int pendiente = rs.getInt("pendiente");
+                    if (!rs.wasNull()) {
+                        txtPendiente.setText(String.valueOf(pendiente));
+                    } else {
+                        txtPendiente.setText(""); // O algún valor predeterminado
+                    }
+                    txtProblem.setText(rs.getString("equipmentProblem"));
+                    txtDiagnostic.setText(rs.getString("diagnostic"));
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error en la consulta. Error en funcion MostrarEquipo.");
+        }
+        
+
+        }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        txtIngreseNombreCliente = new javax.swing.JTextField();
+        panel1 = new java.awt.Panel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblEquipoCliente = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        dtClientes = new javax.swing.JTable();
+        txtNombreCliente = new javax.swing.JTextField();
         lblNombreCliente = new javax.swing.JLabel();
         lblDireccion = new javax.swing.JLabel();
         txtDireccion = new javax.swing.JTextField();
@@ -100,7 +329,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
         lblProblema = new javax.swing.JLabel();
         txtImei = new javax.swing.JTextField();
         lblMaletin = new javax.swing.JLabel();
-        cboMaletin = new javax.swing.JComboBox<>();
+        cboCargador = new javax.swing.JComboBox<>();
         cboProtector = new javax.swing.JComboBox<>();
         lblCargador = new javax.swing.JLabel();
         lblOtros = new javax.swing.JLabel();
@@ -111,7 +340,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
         txtDiagnostic = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         lblServiceTag2 = new javax.swing.JLabel();
-        txtContrasenia = new javax.swing.JTextField();
+        txtPassword = new javax.swing.JTextField();
         txtAnticipo = new javax.swing.JTextField();
         lblServiceTag4 = new javax.swing.JLabel();
         txtCosto = new javax.swing.JTextField();
@@ -132,9 +361,11 @@ public class FrmTelefonos extends javax.swing.JFrame {
         lblPhone9 = new javax.swing.JLabel();
         btnSearchEquip = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
-        txtIngreseNombreCliente2 = new javax.swing.JTextField();
+        txtIngreseNombreCliente = new javax.swing.JTextField();
         txtBuscarEquipoCliente = new javax.swing.JTextField();
         cboOtros = new javax.swing.JComboBox<>();
+        txtIdentidadCliente = new javax.swing.JTextField();
+        txtIdCliente = new javax.swing.JTextField();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -142,8 +373,79 @@ public class FrmTelefonos extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txtIngreseNombreCliente.setEditable(false);
-        jPanel1.add(txtIngreseNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 110, 360, -1));
+        tblEquipoCliente.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "EQUIPO", "NOMBRE", "DESCRIPCION", "FECHA"
+            }
+        ));
+        tblEquipoCliente.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEquipoClienteMouseClicked(evt);
+            }
+        });
+        tblEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblEquipoClienteKeyPressed(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblEquipoCliente);
+
+        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
+        panel1.setLayout(panel1Layout);
+        panel1Layout.setHorizontalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+        );
+        panel1Layout.setVerticalGroup(
+            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 910, 360));
+
+        dtClientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "NOMBRE", "IDENTIDAD", "DIRECCION"
+            }
+        ));
+        dtClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dtClientesMouseClicked(evt);
+            }
+        });
+        dtClientes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dtClientesKeyPressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(dtClientes);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, 600, 60));
+
+        txtNombreCliente.setEditable(false);
+        jPanel1.add(txtNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 110, 360, -1));
 
         lblNombreCliente.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblNombreCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -182,8 +484,8 @@ public class FrmTelefonos extends javax.swing.JFrame {
         lblMaletin.setText("Modelo:");
         jPanel1.add(lblMaletin, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 140, -1, 20));
 
-        cboMaletin.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "      ", "Si", "No", " " }));
-        jPanel1.add(cboMaletin, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 170, -1, -1));
+        cboCargador.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "      ", "Si", "No", " " }));
+        jPanel1.add(cboCargador, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 170, -1, -1));
 
         cboProtector.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "      ", "Si", "No", " " }));
         jPanel1.add(cboProtector, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 170, -1, -1));
@@ -223,7 +525,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
         lblServiceTag2.setForeground(new java.awt.Color(255, 255, 255));
         lblServiceTag2.setText("Contrasena:");
         jPanel1.add(lblServiceTag2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 210, -1, 20));
-        jPanel1.add(txtContrasenia, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 210, 100, -1));
+        jPanel1.add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 210, 100, -1));
 
         txtAnticipo.setText("0");
         jPanel1.add(txtAnticipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 210, 60, -1));
@@ -353,6 +655,11 @@ public class FrmTelefonos extends javax.swing.JFrame {
         btnSave1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
         btnSave1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
         btnSave1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\save64x64.png")); // NOI18N
+        btnSave1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSave1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnSave1, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 430, 80, 70));
 
         lblPhone9.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
@@ -372,14 +679,26 @@ public class FrmTelefonos extends javax.swing.JFrame {
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
         jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 50, 70, 50));
 
-        txtIngreseNombreCliente2.setText(" Ingrese Nombre Cliente");
-        jPanel1.add(txtIngreseNombreCliente2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 60, 340, -1));
+        txtIngreseNombreCliente.setText(" Ingrese Nombre Cliente");
+        txtIngreseNombreCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtIngreseNombreClienteKeyPressed(evt);
+            }
+        });
+        jPanel1.add(txtIngreseNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 60, 340, -1));
 
         txtBuscarEquipoCliente.setText("Buscar Equipo Cliente");
+        txtBuscarEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscarEquipoClienteKeyPressed(evt);
+            }
+        });
         jPanel1.add(txtBuscarEquipoCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 60, 270, -1));
 
         cboOtros.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "      ", "Si", "No", " " }));
         jPanel1.add(cboOtros, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 170, -1, -1));
+        jPanel1.add(txtIdentidadCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, 90, -1));
+        jPanel1.add(txtIdCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 20, 40, -1));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel1.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 930, -1));
@@ -405,10 +724,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPendienteActionPerformed
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
-        FrmInicio open = new FrmInicio();
 
-        open.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnClose2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose2ActionPerformed
@@ -416,10 +732,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
     }//GEN-LAST:event_btnClose2ActionPerformed
 
     private void btnReturn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn2ActionPerformed
-        FrmInicio open = new FrmInicio();
 
-        open.setVisible(true);
-        this.setVisible(false);
     }//GEN-LAST:event_btnReturn2ActionPerformed
 
     private void btnClose3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose3ActionPerformed
@@ -438,6 +751,46 @@ public class FrmTelefonos extends javax.swing.JFrame {
         open.setVisible(true);
         this.setVisible(false);}
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void dtClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dtClientesKeyPressed
+
+    }//GEN-LAST:event_dtClientesKeyPressed
+
+    private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
+        String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
+
+        System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
+
+        mostrarCliente(id);  // Pasar el id al método mostrarCliente
+        jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
+    }//GEN-LAST:event_dtClientesMouseClicked
+
+    private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
+
+    }//GEN-LAST:event_tblEquipoClienteKeyPressed
+
+    private void tblEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoClienteMouseClicked
+        int fila =  tblEquipoCliente.getSelectedRow();
+        String Identificador = tblEquipoCliente.getValueAt(fila, 0).toString();
+        mostrarEquipo(Identificador);
+        panel1.setVisible(false);
+
+    }//GEN-LAST:event_tblEquipoClienteMouseClicked
+
+    private void txtIngreseNombreClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIngreseNombreClienteKeyPressed
+        jPanel2.setVisible(true);
+        buscarCliente();
+    }//GEN-LAST:event_txtIngreseNombreClienteKeyPressed
+
+    private void btnSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSave1ActionPerformed
+        InsertNewPhone();
+    }//GEN-LAST:event_btnSave1ActionPerformed
+
+    private void txtBuscarEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteKeyPressed
+        panel1.setVisible(true);
+        buscarEquipoCliente();
+    }//GEN-LAST:event_txtBuscarEquipoClienteKeyPressed
 
     /**
      * @param args the command line arguments
@@ -493,12 +846,16 @@ public class FrmTelefonos extends javax.swing.JFrame {
     private javax.swing.JButton btnSave1;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSearchEquip;
-    private javax.swing.JComboBox<String> cboMaletin;
+    private javax.swing.JComboBox<String> cboCargador;
     private javax.swing.JComboBox<String> cboModelo;
     private javax.swing.JComboBox<String> cboOtros;
     private javax.swing.JComboBox<String> cboProtector;
+    private javax.swing.JTable dtClientes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblCargador;
     private javax.swing.JLabel lblDireccion;
@@ -520,15 +877,19 @@ public class FrmTelefonos extends javax.swing.JFrame {
     private javax.swing.JLabel lblServiceTag4;
     private javax.swing.JLabel lblServiceTag5;
     private javax.swing.JLabel lblTelefono;
+    private java.awt.Panel panel1;
+    private javax.swing.JTable tblEquipoCliente;
     private javax.swing.JTextField txtAnticipo;
     private javax.swing.JTextField txtBuscarEquipoCliente;
-    private javax.swing.JTextField txtContrasenia;
     private javax.swing.JTextField txtCosto;
     private javax.swing.JTextField txtDiagnostic;
     private javax.swing.JTextField txtDireccion;
+    private javax.swing.JTextField txtIdCliente;
+    private javax.swing.JTextField txtIdentidadCliente;
     private javax.swing.JTextField txtImei;
     private javax.swing.JTextField txtIngreseNombreCliente;
-    private javax.swing.JTextField txtIngreseNombreCliente2;
+    private javax.swing.JTextField txtNombreCliente;
+    private javax.swing.JTextField txtPassword;
     private javax.swing.JTextField txtPendiente;
     private javax.swing.JTextField txtProblem;
     private javax.swing.JTextField txtTelefono;

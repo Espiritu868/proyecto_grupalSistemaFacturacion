@@ -4,9 +4,12 @@ package MAIN;
 import DAO.Conexion;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import static java.util.stream.Collectors.toList;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -14,77 +17,299 @@ import javax.swing.JOptionPane;
  */
 public class FrmImpresoras extends javax.swing.JFrame {
     
-
-public void InsertNewPrinter() {
-    Conexion conn = new Conexion("proyecto_grupal");
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    try {
-        // Obtener datos de los campos
-        String model = String.valueOf(cboModelo.getSelectedItem());
-        String cablePower = String.valueOf(cboCablePoder.getSelectedItem());
-        String usb = String.valueOf(cboUsb.getSelectedItem());
-        String other = String.valueOf(cboOtros.getSelectedItem());
-        Integer coste = Integer.parseInt(txtCosto.getText());
-        Integer advance = Integer.parseInt(txtAnticipo.getText());
-        Integer end = Integer.parseInt(txtFinal.getText());
-        String equipmentProblem = txtProblem.getText();
-        String diagnostic = txtDiagnostic.getText();
-
-        // Conexión a la base de datos
-        con = conn.getConexion();
-        String sql = "INSERT INTO dbprinters (Model, CablePower, Usb, Others, Coste, Advance, TotalFinal, EquipmentProblem, Diagnostic) VALUES (?,?,?,?,?,?,?,?,?)";
-        ps = con.prepareStatement(sql);
-
-        // Configurar los parámetros de la consulta
-        ps.setString(1, model);
-        ps.setString(2, cablePower);
-        ps.setString(3, usb);
-        ps.setString(4, other);
-        ps.setInt(5, coste);
-        ps.setInt(6, advance);
-        ps.setInt(7, end);
-        ps.setString(8, equipmentProblem);
-        ps.setString(9, diagnostic);
-
-        // Ejecutar la consulta y verificar inserción
-        int rowsInserted = ps.executeUpdate();
-
-        if (rowsInserted > 0) {
-            JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
-            toList(); // Actualizar lista de datos
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Verifique los campos numéricos (anticipo y final).", "Error", JOptionPane.ERROR_MESSAGE);
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
-    
     public FrmImpresoras() {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        panel4.setVisible(false);
+        jPanel2.setVisible(false);
     }
+    
+        public void mostrarInicio(){
+                    FrmInicio open = new FrmInicio();
 
+                    open.setVisible(true);
+                    this.setVisible(false);
+        }
+    
+        DefaultTableModel modelo;
+
+        Conexion conn = new Conexion("proyecto");
+        String mensaje = "";
+    
+        public void buscarCliente(){
+
+             Object dataClient[] = new Object[4];
+             modelo = (DefaultTableModel) dtClientes.getModel();
+             Connection con = null;
+             PreparedStatement ps = null;
+             ResultSet rs = null;
+             Statement st = null;
+             modelo.setRowCount(0);
+
+             try {
+                 con = conn.getConexion();
+                 st = con.createStatement();
+                 rs = st.executeQuery("select * from clientes where clientName like '%" + txtIngreseNombreCliente.getText() + "%'");
+
+                 while(rs.next()){
+                     dataClient[0] = rs.getString("id");
+                     dataClient[1] = rs.getString("clientName");
+                     dataClient[2] = rs.getString("idClient");
+                     dataClient[3] = rs.getString("adressClient");
+
+                     modelo.addRow(dataClient);
+
+                     dtClientes.setModel(modelo);
+
+                 }
+             } catch (Exception e) {
+                 System.out.println("Error en la consulta. problema en BuscarCliente");
+             }
+
+         }  
+        public void mostrarCliente(String Id) {
+            Connection con = null;
+            ResultSet rs = null;
+            PreparedStatement pst = null;
+
+            try {
+                // Obtener conexión
+                con = conn.getConexion();
+
+                // Consulta SQL para buscar cliente por id
+                String consulta = "SELECT * FROM clientes WHERE id = ?"; // Uso de ? para seguridad
+
+                // Crear el PreparedStatement
+                pst = con.prepareStatement(consulta);
+
+                // Establecer el parámetro de la consulta
+                pst.setString(1, Id.trim()); // Usar .trim() para eliminar espacios si es necesario
+
+                // Ejecutar la consulta
+                rs = pst.executeQuery();
+
+                // Comprobar si se encontraron datos
+                if (rs.next()) {
+                    // Asignar los datos a los campos correspondientes
+                    txtIdentidadCliente.setText(rs.getString("idClient"));
+                    txtNombreCliente.setText(rs.getString("clientName"));
+                    txtTelefono.setText(rs.getString("phoneClient"));
+                    txtDireccion.setText(rs.getString("adressClient"));
+
+                } else {
+                    // En caso de que no se encuentren resultados
+                    JOptionPane.showMessageDialog(null, "No se encontraron datos para el cliente con el ID proporcionado.");
+                    System.out.println("No se encontraron datos para el ID: " + Id);
+                }
+            } catch (Exception e) {
+                // Manejo de excepciones
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (rs != null) rs.close();
+                    if (pst != null) pst.close();
+                    if (con != null) con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+                public void InsertNewPrinter() {
+            // Crear una instancia de Conexion para conectar con la base de datos
+            Conexion conn = new Conexion("proyecto");  // "proyecto" es el nombre de tu base de datos
+
+            // Obtener la conexión usando el método getConexion
+            Connection con = conn.getConexion();
+
+            // Verificar si la conexión es válida
+            if (con == null) {
+                JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;  // Salir si la conexión no es válida
+            }
+
+            PreparedStatement ps = null;
+
+            try {
+                // Capturar y validar los valores de los componentes
+                String idClient = txtIdentidadCliente.getText().trim();  // Obtener idClient
+                String name = txtNombreCliente.getText().trim();
+                String phone = txtTelefono.getText().trim();
+                String adress = txtDireccion.getText().trim();
+                String model = String.valueOf(cboModelo.getSelectedItem()).trim();
+                String cablePoder = String.valueOf(cboCablePoder.getSelectedItem()).trim();
+                String usb = String.valueOf(cboUsb.getSelectedItem()).trim();
+                String other = String.valueOf(cboOtros.getSelectedItem()).trim();
+
+                // Validar campos numéricos
+                Integer costo = Integer.parseInt(txtCosto.getText().trim());
+                Integer anticipo = Integer.parseInt(txtAnticipo.getText().trim());
+                Integer pendiente = Integer.parseInt(txtFinal.getText().trim());
+
+                String problema = txtProblem.getText().trim();
+                String diagnostico = txtDiagnostic.getText().trim();
+
+                // Validar campos obligatorios
+                if (name.isEmpty() || phone.isEmpty() || adress.isEmpty() || model.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, llena todos los campos obligatorios.");
+                    return;
+                }
+
+                // Preparar la consulta SQL (sin incluir 'id' ya que es autoincrementable)
+                String sql = "INSERT INTO impresoras (idClient, clientName, phoneClient, adressClient, model, cPower, usb, other, coste, anticipo, final, equipmentProblem, diagnostic) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; 
+                ps = con.prepareStatement(sql);
+
+                // Asignar valores a los parámetros
+                ps.setString(1, idClient);  // Asignar el valor de idClient
+                ps.setString(2, name);
+                ps.setString(3, phone);
+                ps.setString(4, adress);
+                ps.setString(5, model);
+                ps.setString(6, cablePoder);
+                ps.setString(7, usb);
+                ps.setString(8, other);
+                ps.setInt(9, costo);
+                ps.setInt(10, anticipo);
+                ps.setInt(11, pendiente);
+                ps.setString(12, problema);
+                ps.setString(13, diagnostico);
+
+                // Ejecutar la consulta
+                int rowsInserted = ps.executeUpdate();
+
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+                    toList(); // Refrescar la lista
+                    mostrarInicio();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                // Cerrar recursos
+                try {
+                    if (ps != null) ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+                
+        public void buscarEquipoCliente() {
+            // Crear una instancia de Conexion para conectar con la base de datos
+            Conexion conn = new Conexion("proyecto"); // "proyecto" es el nombre de tu base de datos
+
+            // Obtener la conexión usando el método getConexion
+            Connection con = conn.getConexion();
+
+            // Verificar si la conexión es válida
+            if (con == null) {
+                JOptionPane.showMessageDialog(this, "No se pudo conectar a la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Salir si la conexión no es válida
+            }
+
+            Object[] dataClient = new Object[5];
+            modelo = (DefaultTableModel) tblEquipoCliente3.getModel();
+            modelo.setRowCount(0); // Limpiar tabla antes de agregar nuevas filas
+
+            String query = "SELECT id, model, clientName, equipmentProblem, idClient " +
+                           "FROM impresoras WHERE clientName LIKE ?";
+
+            try (PreparedStatement ps = con.prepareStatement(query)) {
+                // Configurar el parámetro de la consulta
+                ps.setString(1, "%" + txtBuscarEquipoCliente.getText() + "%");
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    // Procesar los resultados de la consulta
+                    while (rs.next()) {
+                        dataClient[0] = rs.getString("id");
+                        dataClient[1] = rs.getString("model");
+                        dataClient[2] = rs.getString("clientName");
+                        dataClient[3] = rs.getString("equipmentProblem");
+                        dataClient[4] = rs.getString("idClient");
+
+                        modelo.addRow(dataClient);
+                    }
+                }
+
+                // Actualizar el modelo de la tabla
+                tblEquipoCliente3.setModel(modelo);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al buscar equipo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        public void mostrarEquipo(String Identificador){
+    
+            Connection con = null;
+
+            ResultSet rs = null;
+            Statement st = null;
+
+
+            try {
+                con = conn.getConexion();
+                st = con.createStatement();
+                rs = st.executeQuery("select * from impresoras where id = '"+ Identificador +"'");
+
+            while(rs.next()){
+
+                        // Asignar valores a los componentes
+                        txtIdCliente.setText(rs.getString("id"));
+                        txtIdentidadCliente.setText(rs.getString("idClient"));
+                        txtNombreCliente.setText(rs.getString("clientName"));
+                        txtTelefono.setText(rs.getString("phoneClient"));
+                        txtDireccion.setText(rs.getString("adressClient"));
+                        cboModelo.setSelectedItem(rs.getString("model"));
+                        cboCablePoder.setSelectedItem(rs.getString("cPower"));
+                        cboUsb.setSelectedItem(rs.getString("usb"));
+                        cboOtros.setSelectedItem(rs.getString("other"));
+                        int coste = rs.getInt("coste");
+                        if (!rs.wasNull()) {
+                            txtCosto.setText(String.valueOf(coste));
+                        } else {
+                            txtCosto.setText(""); // O algún valor predeterminado
+                        }
+                        int anticipo = rs.getInt("anticipo");
+                        if (!rs.wasNull()) {
+                            txtAnticipo.setText(String.valueOf(anticipo));
+                        } else {
+                            txtAnticipo.setText(""); // O algún valor predeterminado
+                        }
+                        int pendiente = rs.getInt("final");
+                        if (!rs.wasNull()) {
+                            txtFinal.setText(String.valueOf(pendiente));
+                        } else {
+                            txtFinal.setText(""); // O algún valor predeterminado
+                        }
+                        txtProblem.setText(rs.getString("equipmentProblem"));
+                        txtDiagnostic.setText(rs.getString("diagnostic"));
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error en la consulta. Error en funcion MostrarEquipo.");
+            }
+        }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        txtIngreseNombreCliente = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        dtClientes = new javax.swing.JTable();
+        txtIdentidadCliente1 = new javax.swing.JTextField();
+        panel4 = new java.awt.Panel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tblEquipoCliente3 = new javax.swing.JTable();
+        txtNombreCliente = new javax.swing.JTextField();
         lblNombreCliente = new javax.swing.JLabel();
         lblDireccion = new javax.swing.JLabel();
         txtDireccion = new javax.swing.JTextField();
@@ -111,7 +336,7 @@ public void InsertNewPrinter() {
         txtFinal = new javax.swing.JTextField();
         btnSearchEquip = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
-        txtIngreseNombreCliente2 = new javax.swing.JTextField();
+        txtIngreseNombreCliente = new javax.swing.JTextField();
         txtBuscarEquipoCliente = new javax.swing.JTextField();
         btnReturn1 = new javax.swing.JButton();
         lblPhone4 = new javax.swing.JLabel();
@@ -119,6 +344,8 @@ public void InsertNewPrinter() {
         lblPhone6 = new javax.swing.JLabel();
         btnSave = new javax.swing.JButton();
         lblPhone7 = new javax.swing.JLabel();
+        txtIdentidadCliente = new javax.swing.JTextField();
+        txtIdCliente = new javax.swing.JTextField();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -126,8 +353,91 @@ public void InsertNewPrinter() {
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txtIngreseNombreCliente.setEditable(false);
-        jPanel1.add(txtIngreseNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 360, -1));
+        dtClientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "NOMBRE", "IDENTIDAD", "DIRECCION"
+            }
+        ));
+        dtClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dtClientesMouseClicked(evt);
+            }
+        });
+        dtClientes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dtClientesKeyPressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(dtClientes);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(txtIdentidadCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(txtIdentidadCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 620, 70));
+
+        tblEquipoCliente3.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "EQUIPO", "NOMBRE", "DESCRIPCION", "FECHA"
+            }
+        ));
+        tblEquipoCliente3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblEquipoCliente3MouseClicked(evt);
+            }
+        });
+        tblEquipoCliente3.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblEquipoCliente3KeyPressed(evt);
+            }
+        });
+        jScrollPane5.setViewportView(tblEquipoCliente3);
+
+        javax.swing.GroupLayout panel4Layout = new javax.swing.GroupLayout(panel4);
+        panel4.setLayout(panel4Layout);
+        panel4Layout.setHorizontalGroup(
+            panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+        );
+        panel4Layout.setVerticalGroup(
+            panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel4Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel1.add(panel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 440));
+
+        txtNombreCliente.setEditable(false);
+        jPanel1.add(txtNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 360, -1));
 
         lblNombreCliente.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblNombreCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -238,10 +548,20 @@ public void InsertNewPrinter() {
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
         jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 20, 70, 50));
 
-        txtIngreseNombreCliente2.setText(" Ingrese Nombre Cliente");
-        jPanel1.add(txtIngreseNombreCliente2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 30, 310, -1));
+        txtIngreseNombreCliente.setText(" Ingrese Nombre Cliente");
+        txtIngreseNombreCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtIngreseNombreClienteKeyPressed(evt);
+            }
+        });
+        jPanel1.add(txtIngreseNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 30, 310, -1));
 
         txtBuscarEquipoCliente.setText("Buscar Equipo Cliente");
+        txtBuscarEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscarEquipoClienteKeyPressed(evt);
+            }
+        });
         jPanel1.add(txtBuscarEquipoCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, 270, -1));
 
         btnReturn1.setBackground(new java.awt.Color(255, 204, 51));
@@ -296,6 +616,8 @@ public void InsertNewPrinter() {
         lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone7.setText("GUARDAR");
         jPanel1.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 510, -1, -1));
+        jPanel1.add(txtIdentidadCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 80, -1));
+        jPanel1.add(txtIdCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 80, -1));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         lblBackground.setText("jLabel1");
@@ -320,10 +642,7 @@ public void InsertNewPrinter() {
     }//GEN-LAST:event_txtFinalActionPerformed
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
-        FrmInicio open = new FrmInicio();
-
-        open.setVisible(true);
-        this.setVisible(false);
+        
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnClose2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose2ActionPerformed
@@ -331,16 +650,50 @@ public void InsertNewPrinter() {
     }//GEN-LAST:event_btnClose2ActionPerformed
 
     private void cboOtrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOtrosActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_cboOtrosActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         InsertNewPrinter();
         
-        FrmInicio open = new FrmInicio();
-        open.setVisible(true);
-        this.setVisible(false);
+        if (mensaje == "¡Datos insertados exitosamente!"){
+        mostrarInicio();}
     }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void txtIngreseNombreClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIngreseNombreClienteKeyPressed
+        jPanel2.setVisible(true);
+        buscarCliente();
+    }//GEN-LAST:event_txtIngreseNombreClienteKeyPressed
+
+    private void dtClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dtClientesKeyPressed
+
+    }//GEN-LAST:event_dtClientesKeyPressed
+
+    private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
+        String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
+
+        System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
+
+        mostrarCliente(id);  // Pasar el id al método mostrarCliente
+        jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
+    }//GEN-LAST:event_dtClientesMouseClicked
+
+    private void tblEquipoCliente3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoCliente3KeyPressed
+
+    }//GEN-LAST:event_tblEquipoCliente3KeyPressed
+
+    private void tblEquipoCliente3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoCliente3MouseClicked
+        int fila =  tblEquipoCliente3.getSelectedRow();
+        String Identificador = tblEquipoCliente3.getValueAt(fila, 0).toString();
+        mostrarEquipo(Identificador);
+        panel4.setVisible(false);
+    }//GEN-LAST:event_tblEquipoCliente3MouseClicked
+
+    private void txtBuscarEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteKeyPressed
+        panel4.setVisible(true);
+        buscarEquipoCliente();
+    }//GEN-LAST:event_txtBuscarEquipoClienteKeyPressed
 
     /**
      * @param args the command line arguments
@@ -377,8 +730,15 @@ public void InsertNewPrinter() {
     private javax.swing.JComboBox<String> cboModelo;
     private javax.swing.JComboBox<String> cboOtros;
     private javax.swing.JComboBox<String> cboUsb;
+    private javax.swing.JTable dtClientes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblCargador;
     private javax.swing.JLabel lblDireccion;
@@ -395,14 +755,25 @@ public void InsertNewPrinter() {
     private javax.swing.JLabel lblServiceTag4;
     private javax.swing.JLabel lblServiceTag5;
     private javax.swing.JLabel lblTelefono;
+    private java.awt.Panel panel1;
+    private java.awt.Panel panel2;
+    private java.awt.Panel panel3;
+    private java.awt.Panel panel4;
+    private javax.swing.JTable tblEquipoCliente;
+    private javax.swing.JTable tblEquipoCliente1;
+    private javax.swing.JTable tblEquipoCliente2;
+    private javax.swing.JTable tblEquipoCliente3;
     private javax.swing.JTextField txtAnticipo;
     private javax.swing.JTextField txtBuscarEquipoCliente;
     private javax.swing.JTextField txtCosto;
     private javax.swing.JTextField txtDiagnostic;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtFinal;
+    private javax.swing.JTextField txtIdCliente;
+    private javax.swing.JTextField txtIdentidadCliente;
+    private javax.swing.JTextField txtIdentidadCliente1;
     private javax.swing.JTextField txtIngreseNombreCliente;
-    private javax.swing.JTextField txtIngreseNombreCliente2;
+    private javax.swing.JTextField txtNombreCliente;
     private javax.swing.JTextField txtProblem;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables

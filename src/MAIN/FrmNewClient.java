@@ -264,7 +264,7 @@ public void InsertNewClient() {
             con = conn.getConexion();
 
             // Consulta SQL para eliminar
-            String sql = "DELETE FROM clientes WHERE idClient = ?";
+            String sql = "DELETE FROM clientes WHERE id = ?";
             ps = con.prepareStatement(sql);
 
             // Asignar el valor del ID al parámetro
@@ -722,6 +722,7 @@ public void InsertNewClient() {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         
         deleteClient();
+        
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnActualizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseClicked
