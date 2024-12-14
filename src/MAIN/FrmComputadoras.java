@@ -23,7 +23,10 @@ public class FrmComputadoras extends javax.swing.JFrame {
         transparentButton();
         toList();
         jPanel2.setVisible(false);
-        panel1.setVisible(false);       
+        panel1.setVisible(false); 
+        btnActualizar.setEnabled(false);
+        txtIdCliente.setVisible(false);
+        txtIdentidadCliente.setVisible(false);
     }
     
     DefaultTableModel modelo;
@@ -36,6 +39,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
 
                     open.setVisible(true);
                     this.setVisible(false);
+                    
                 }
 
 
@@ -111,18 +115,23 @@ public class FrmComputadoras extends javax.swing.JFrame {
                 // Manejo de excepciones
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
-            } finally {
-                // Cerrar recursos
-                try {
-                    if (rs != null) rs.close();
-                    if (pst != null) pst.close();
-                    if (con != null) con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                } finally {
+                    // Cerrar solo los recursos necesarios
+                    try {
+                        if (rs != null) rs.close();
+                        if (pst != null) pst.close();
+                        // Nota: No cerramos la conexión aquí
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+        private void limpiarCamposCliente() {
+        txtIdentidadCliente.setText("");
+        txtNombreCliente.setText("");
+        txtTelefono.setText("");
+        txtDireccion.setText("");
         }
-        
         public void InsertNewComputer() {
             // Crear una instancia de Conexion para conectar con la base de datos
             Conexion conn = new Conexion("proyecto");  // "proyecto" es el nombre de tu base de datos
@@ -446,6 +455,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
                }
            }
        }
+        
+        
 
 
         
@@ -553,10 +564,10 @@ public class FrmComputadoras extends javax.swing.JFrame {
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
         );
 
-        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 390, 910, 70));
+        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 200));
 
         dtClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -596,7 +607,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 80, 620, 40));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 80, 620, 70));
 
         btnSearchEquip.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchEquip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -756,10 +767,10 @@ public class FrmComputadoras extends javax.swing.JFrame {
 
         btnReturn1.setBackground(new java.awt.Color(255, 204, 51));
         btnReturn1.setForeground(new java.awt.Color(255, 204, 51));
-        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
+        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
         btnReturn1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
-        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\Retur_72.png")); // NOI18N
+        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
+        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48.png")); // NOI18N
         btnReturn1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnReturn1ActionPerformed(evt);
@@ -774,10 +785,10 @@ public class FrmComputadoras extends javax.swing.JFrame {
 
         btnClose2.setBackground(new java.awt.Color(255, 204, 51));
         btnClose2.setForeground(new java.awt.Color(255, 204, 51));
-        btnClose2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
+        btnClose2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
         btnClose2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnClose2.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
-        btnClose2.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_72.png")); // NOI18N
+        btnClose2.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
+        btnClose2.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50.png")); // NOI18N
         btnClose2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClose2ActionPerformed(evt);
@@ -939,12 +950,14 @@ public class FrmComputadoras extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSearchEquipActionPerformed
 
     private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        limpiarCamposCliente();
         int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
         String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
 
         System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
 
         mostrarCliente(id);  // Pasar el id al método mostrarCliente
+        
         jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
     }//GEN-LAST:event_dtClientesMouseClicked
 
@@ -985,6 +998,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
         String Identificador = tblEquipoCliente.getValueAt(fila, 0).toString();
         mostrarEquipo(Identificador);
         panel1.setVisible(false);
+        btnSave.setEnabled(false);
+        btnActualizar.setEnabled(true);
 
     }//GEN-LAST:event_tblEquipoClienteMouseClicked
 

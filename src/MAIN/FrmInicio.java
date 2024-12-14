@@ -29,7 +29,6 @@ public class FrmInicio extends javax.swing.JFrame {
         btnPhone = new javax.swing.JButton();
         btnFacture = new javax.swing.JButton();
         btnNewClient = new javax.swing.JButton();
-        lblPhone6 = new javax.swing.JLabel();
         btnProductAdd = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
         lblPhone3 = new javax.swing.JLabel();
@@ -43,6 +42,7 @@ public class FrmInicio extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
+        lblPhone6 = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -125,11 +125,6 @@ public class FrmInicio extends javax.swing.JFrame {
         });
         jPanel1.add(btnNewClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, -1, -1));
 
-        lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        lblPhone6.setForeground(new java.awt.Color(0, 0, 0));
-        lblPhone6.setText("NUEVO CLIENTE");
-        jPanel1.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, -1, -1));
-
         btnProductAdd.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\agregarproducto90x90pp.png")); // NOI18N
         btnProductAdd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnProductAdd.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\agregarproducto90x90pp.png")); // NOI18N
@@ -139,7 +134,7 @@ public class FrmInicio extends javax.swing.JFrame {
                 btnProductAddActionPerformed(evt);
             }
         });
-        jPanel1.add(btnProductAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 250, -1, -1));
+        jPanel1.add(btnProductAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 250, -1, -1));
 
         btnReturn.setBackground(new java.awt.Color(255, 204, 51));
         btnReturn.setForeground(new java.awt.Color(255, 204, 51));
@@ -273,18 +268,26 @@ public class FrmInicio extends javax.swing.JFrame {
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setForeground(new java.awt.Color(255, 255, 255));
 
+        lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone6.setForeground(new java.awt.Color(0, 0, 0));
+        lblPhone6.setText("NUEVO PRODUCTO");
+
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 150, Short.MAX_VALUE)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addComponent(lblPhone6)
+                .addGap(0, 1, Short.MAX_VALUE))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 22, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lblPhone6))
         );
 
-        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 150, -1));
+        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 170, -1));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel1.add(lblBackground, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));

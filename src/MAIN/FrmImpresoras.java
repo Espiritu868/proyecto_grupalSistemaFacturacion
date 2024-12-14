@@ -23,6 +23,9 @@ public class FrmImpresoras extends javax.swing.JFrame {
         transparentButton();
         panel4.setVisible(false);
         jPanel2.setVisible(false);
+        txtIdCliente.setVisible(false);
+        txtIdentidadCliente.setVisible(false);
+        btnActualizar.setEnabled(false);
     }
     
         public void mostrarInicio(){
@@ -215,7 +218,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
             }
 
             Object[] dataClient = new Object[5];
-            modelo = (DefaultTableModel) tblEquipoCliente3.getModel();
+            modelo = (DefaultTableModel) tblEquipoCliente.getModel();
             modelo.setRowCount(0); // Limpiar tabla antes de agregar nuevas filas
 
             String query = "SELECT id, model, clientName, equipmentProblem, idClient " +
@@ -239,7 +242,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 }
 
                 // Actualizar el modelo de la tabla
-                tblEquipoCliente3.setModel(modelo);
+                tblEquipoCliente.setModel(modelo);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Error al buscar equipo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -297,6 +300,136 @@ public class FrmImpresoras extends javax.swing.JFrame {
             }
         }
     
+         public void ModificarNewClient(){
+
+           Connection con = null;
+           PreparedStatement ps = null;
+
+           try {
+
+               // Obtener los datos de los campos modificables
+               String model = String.valueOf(cboModelo.getSelectedItem()); 
+               String cpower = String.valueOf(cboCablePoder.getSelectedItem()); 
+               String usb = String.valueOf(cboUsb.getSelectedItem());  
+               String other = String.valueOf(cboOtros.getSelectedItem());        
+               int coste = Integer.parseInt(txtCosto.getText());  
+               int anticipo = Integer.parseInt(txtAnticipo.getText()); 
+               int finalCost = Integer.parseInt(txtFinal.getText()); 
+               String problem = txtProblem.getText();    
+               String diagnostic = txtDiagnostic.getText();
+
+               // Obtener el id de la computadora
+               int idimpresoras = Integer.parseInt(txtIdCliente.getText());
+
+               con = conn.getConexion();  // Conexión a la base de datos
+
+               // Consulta SQL para actualizar los datos
+               String sql = "UPDATE impresoras SET " +
+                            "model = ?, cPower = ?, usb = ?, other = ?, " +
+                            "coste = ?, anticipo = ?, final = ?, " +
+                            "equipmentProblem = ?, diagnostic = ? WHERE id = ?";
+
+               ps = con.prepareStatement(sql);
+
+               // Asignar los valores a los parámetros del PreparedStatement
+               ps.setString(1, model);
+               ps.setString(2, cpower);
+               ps.setString(3, usb);
+               ps.setString(4, other);
+               ps.setInt(5, coste);
+               ps.setInt(6, anticipo);
+               ps.setInt(7, finalCost );
+               ps.setString(8, problem );
+               ps.setString(9, diagnostic );
+               ps.setInt(10, idimpresoras);  // Aseguramos que se actualiza el registro con el id específico
+
+               // Ejecutar la actualización
+               int rowsUpdated = ps.executeUpdate();
+
+               // Verificar si la actualización fue exitosa
+               if (rowsUpdated > 0) {
+                   JOptionPane.showMessageDialog(this, "¡Datos actualizados exitosamente!");
+                   toList();  // Llamada a un método para refrescar la lista de registros
+                   mostrarInicio();
+               } else {
+                   JOptionPane.showMessageDialog(this, "No se encontró el registro a actualizar.");
+               }
+           } catch (SQLException e) {
+               e.printStackTrace();
+               JOptionPane.showMessageDialog(this, "Ocurrió un error al actualizar los datos: " + e.getMessage());
+           } catch (NumberFormatException e) {
+               JOptionPane.showMessageDialog(this, "Uno de los campos numéricos no tiene un valor válido.");
+           } finally {
+               try {
+                   if (ps != null) ps.close();
+                   if (con != null) con.close();
+               } catch (SQLException e) {
+                   e.printStackTrace();
+               }
+           }
+       }
+   
+         public void deleteImpresoras(){
+    
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            // Obtener la fila seleccionada
+            int selectedRow = tblEquipoCliente.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecciona un equipo para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                return; // Salir si no hay selección
+            }
+
+            // Obtener el ID del cliente seleccionado desde la tabla
+            int idClient = Integer.parseInt(tblEquipoCliente.getValueAt(selectedRow, 0).toString()); // Suponiendo que el ID está en la primera columna
+
+            // Confirmar la eliminación
+            int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar el equipo de este cliente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return; // Salir si el usuario no confirma
+            }
+
+            // Conexión a la base de datos
+            con = conn.getConexion();
+
+            // Consulta SQL para eliminar
+            String sql = "DELETE FROM impresoras WHERE id = ?";
+            ps = con.prepareStatement(sql);
+
+            // Asignar el valor del ID al parámetro
+            ps.setInt(1, idClient);
+
+            // Ejecutar la consulta
+            int rowsDeleted = ps.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                JOptionPane.showMessageDialog(this, "¡Cliente eliminado exitosamente!");
+                
+                toList(); // Actualizar la tabla
+                FrmInicio open = new FrmInicio();
+                open.setVisible(true);
+                this.setVisible(false);
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró el cliente a eliminar.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Ocurrió un error al eliminar el cliente: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El ID del cliente debe ser un número válido.");
+        } finally {
+            try {
+                if (ps != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+         
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -308,7 +441,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
         txtIdentidadCliente1 = new javax.swing.JTextField();
         panel4 = new java.awt.Panel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        tblEquipoCliente3 = new javax.swing.JTable();
+        tblEquipoCliente = new javax.swing.JTable();
         txtNombreCliente = new javax.swing.JTextField();
         lblNombreCliente = new javax.swing.JLabel();
         lblDireccion = new javax.swing.JLabel();
@@ -346,6 +479,10 @@ public class FrmImpresoras extends javax.swing.JFrame {
         lblPhone7 = new javax.swing.JLabel();
         txtIdentidadCliente = new javax.swing.JTextField();
         txtIdCliente = new javax.swing.JTextField();
+        lblPhone8 = new javax.swing.JLabel();
+        btnActualizar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        lblPhone5 = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -398,7 +535,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 620, 70));
 
-        tblEquipoCliente3.setModel(new javax.swing.table.DefaultTableModel(
+        tblEquipoCliente.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -409,17 +546,17 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 "ID", "EQUIPO", "NOMBRE", "DESCRIPCION", "FECHA"
             }
         ));
-        tblEquipoCliente3.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblEquipoCliente.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblEquipoCliente3MouseClicked(evt);
+                tblEquipoClienteMouseClicked(evt);
             }
         });
-        tblEquipoCliente3.addKeyListener(new java.awt.event.KeyAdapter() {
+        tblEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                tblEquipoCliente3KeyPressed(evt);
+                tblEquipoClienteKeyPressed(evt);
             }
         });
-        jScrollPane5.setViewportView(tblEquipoCliente3);
+        jScrollPane5.setViewportView(tblEquipoCliente);
 
         javax.swing.GroupLayout panel4Layout = new javax.swing.GroupLayout(panel4);
         panel4.setLayout(panel4Layout);
@@ -430,11 +567,12 @@ public class FrmImpresoras extends javax.swing.JFrame {
         panel4Layout.setVerticalGroup(
             panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel4Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(348, 348, 348))
         );
 
-        jPanel1.add(panel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 440));
+        jPanel1.add(panel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 100));
 
         txtNombreCliente.setEditable(false);
         jPanel1.add(txtNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 360, -1));
@@ -575,12 +713,12 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 btnReturn1ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 440, 80, 70));
+        jPanel1.add(btnReturn1, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 440, 80, 70));
 
         lblPhone4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone4.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone4.setText("REGRESAR");
-        jPanel1.add(lblPhone4, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 510, -1, -1));
+        jPanel1.add(lblPhone4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 510, -1, -1));
 
         btnClose2.setBackground(new java.awt.Color(255, 204, 51));
         btnClose2.setForeground(new java.awt.Color(255, 204, 51));
@@ -593,12 +731,12 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 btnClose2ActionPerformed(evt);
             }
         });
-        jPanel1.add(btnClose2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 440, 80, 70));
+        jPanel1.add(btnClose2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 440, 80, 70));
 
         lblPhone6.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone6.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone6.setText("CERRAR");
-        jPanel1.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 510, -1, -1));
+        jPanel1.add(lblPhone6, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 510, -1, -1));
 
         btnSave.setBackground(new java.awt.Color(255, 204, 51));
         btnSave.setForeground(new java.awt.Color(255, 204, 51));
@@ -610,14 +748,55 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 btnSaveActionPerformed(evt);
             }
         });
-        jPanel1.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 440, 80, 70));
+        jPanel1.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 440, 80, 70));
 
         lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone7.setText("GUARDAR");
-        jPanel1.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 510, -1, -1));
+        jPanel1.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 510, -1, -1));
         jPanel1.add(txtIdentidadCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 80, -1));
         jPanel1.add(txtIdCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 80, -1));
+
+        lblPhone8.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone8.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone8.setText("ACTUALIZAR");
+        jPanel1.add(lblPhone8, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 510, -1, -1));
+
+        btnActualizar.setBackground(java.awt.Color.orange);
+        btnActualizar.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
+        btnActualizar.setToolTipText("");
+        btnActualizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnActualizar.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48pp.png")); // NOI18N
+        btnActualizar.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\refresh48x48.png")); // NOI18N
+        btnActualizar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnActualizarMouseClicked(evt);
+            }
+        });
+        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnActualizarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 440, 80, 70));
+
+        btnEliminar.setBackground(java.awt.Color.orange);
+        btnEliminar.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48pp.png")); // NOI18N
+        btnEliminar.setToolTipText("");
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminar.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48pp.png")); // NOI18N
+        btnEliminar.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\delete48x48.png")); // NOI18N
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 440, 80, 70));
+
+        lblPhone5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
+        lblPhone5.setText("ELIMINAR");
+        jPanel1.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 510, -1, 20));
 
         lblBackground.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         lblBackground.setText("jLabel1");
@@ -642,7 +821,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
     }//GEN-LAST:event_txtFinalActionPerformed
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
-        
+        mostrarInicio();
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnClose2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose2ActionPerformed
@@ -679,21 +858,35 @@ public class FrmImpresoras extends javax.swing.JFrame {
         jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
     }//GEN-LAST:event_dtClientesMouseClicked
 
-    private void tblEquipoCliente3KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoCliente3KeyPressed
+    private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
 
-    }//GEN-LAST:event_tblEquipoCliente3KeyPressed
+    }//GEN-LAST:event_tblEquipoClienteKeyPressed
 
-    private void tblEquipoCliente3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoCliente3MouseClicked
-        int fila =  tblEquipoCliente3.getSelectedRow();
-        String Identificador = tblEquipoCliente3.getValueAt(fila, 0).toString();
+    private void tblEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoClienteMouseClicked
+        int fila =  tblEquipoCliente.getSelectedRow();
+        String Identificador = tblEquipoCliente.getValueAt(fila, 0).toString();
         mostrarEquipo(Identificador);
         panel4.setVisible(false);
-    }//GEN-LAST:event_tblEquipoCliente3MouseClicked
+        btnSave.setEnabled(false);
+        btnActualizar.setEnabled(true);
+    }//GEN-LAST:event_tblEquipoClienteMouseClicked
 
     private void txtBuscarEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteKeyPressed
         panel4.setVisible(true);
         buscarEquipoCliente();
     }//GEN-LAST:event_txtBuscarEquipoClienteKeyPressed
+
+    private void btnActualizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseClicked
+        
+    }//GEN-LAST:event_btnActualizarMouseClicked
+
+    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
+      ModificarNewClient();
+    }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        deleteImpresoras();
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -721,7 +914,9 @@ public class FrmImpresoras extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizar;
     private javax.swing.JButton btnClose2;
+    private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnReturn1;
     private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSearch;
@@ -735,9 +930,6 @@ public class FrmImpresoras extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblCargador;
@@ -747,22 +939,18 @@ public class FrmImpresoras extends javax.swing.JFrame {
     private javax.swing.JLabel lblNombreCliente;
     private javax.swing.JLabel lblOtros;
     private javax.swing.JLabel lblPhone4;
+    private javax.swing.JLabel lblPhone5;
     private javax.swing.JLabel lblPhone6;
     private javax.swing.JLabel lblPhone7;
+    private javax.swing.JLabel lblPhone8;
     private javax.swing.JLabel lblProblema;
     private javax.swing.JLabel lblProblema1;
     private javax.swing.JLabel lblServiceTag3;
     private javax.swing.JLabel lblServiceTag4;
     private javax.swing.JLabel lblServiceTag5;
     private javax.swing.JLabel lblTelefono;
-    private java.awt.Panel panel1;
-    private java.awt.Panel panel2;
-    private java.awt.Panel panel3;
     private java.awt.Panel panel4;
     private javax.swing.JTable tblEquipoCliente;
-    private javax.swing.JTable tblEquipoCliente1;
-    private javax.swing.JTable tblEquipoCliente2;
-    private javax.swing.JTable tblEquipoCliente3;
     private javax.swing.JTextField txtAnticipo;
     private javax.swing.JTextField txtBuscarEquipoCliente;
     private javax.swing.JTextField txtCosto;

@@ -22,6 +22,12 @@ public class FrmNewClient extends javax.swing.JFrame {
 
     String mensaje; 
  
+    public void mostrarInicio(){
+    
+    FrmInicio open = new FrmInicio();
+    open.setVisible(true);
+    this.setVisible(false);
+    }
     
 private void toList(){
     
@@ -126,6 +132,7 @@ public void InsertNewClient() {
         if (rowsInserted > 0) {
             JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
             toList(); // Refrescar la lista si es necesario
+            mostrarInicio();
         } else {
             JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
         }
@@ -219,7 +226,9 @@ public void InsertNewClient() {
 
             if (rowsUpdated > 0) {
                 JOptionPane.showMessageDialog(this, "¡Datos actualizados exitosamente!");
-                toList(); 
+                toList();
+                mostrarInicio();
+                
             } else {
                 JOptionPane.showMessageDialog(this, "No se encontró el registro a actualizar.");
             }
@@ -277,9 +286,7 @@ public void InsertNewClient() {
                 JOptionPane.showMessageDialog(this, "¡Cliente eliminado exitosamente!");
                 
                 toList(); // Actualizar la tabla
-                FrmInicio open = new FrmInicio();
-                open.setVisible(true);
-                this.setVisible(false);
+                mostrarInicio();
             } else {
                 JOptionPane.showMessageDialog(this, "No se encontró el cliente a eliminar.");
             }
