@@ -7,12 +7,16 @@ import java.awt.Color;
 import java.awt.Font;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import static java.util.stream.Collectors.toList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,62 +24,174 @@ import javax.swing.SwingUtilities;
  */
 public class FrmFactura extends javax.swing.JFrame {
 
-    public void AddNewFacture() {
-    Conexion conn = new Conexion("proyecto_grupal");
-    Connection con = null;
-    PreparedStatement ps = null;
-
-    try {
-        
-        float total = Float.parseFloat(txtTotal.getSelectedText());
-        float methodOfPayment = Float.parseFloat(String.valueOf(cboFormaDePago.getSelectedItem()));
-        float cash = Float.parseFloat(txtEfectivo.getSelectedText());
-        float change = Float.parseFloat(txtCambio.getSelectedText());
-        String observations = txtObservaciones.getSelectedText();
-
-        // Conexión a la base de datos
-        con = conn.getConexion();
-        String sql = "INSERT INTO dbfacture (Total, MethodOfPayment, Cash, Change, Observations) VALUES (?,?,?,?,?)";
-        ps = con.prepareStatement(sql);
-
-        // Configurar los parámetros de la consulta
-        ps.setFloat(1, total);
-        ps.setFloat(2, methodOfPayment);
-        ps.setFloat(3, cash);
-        ps.setFloat(4, change);
-        ps.setString(5, observations);
-
-        // Ejecutar la consulta y verificar inserción
-        int rowsInserted = ps.executeUpdate();
-
-        if (rowsInserted > 0) {
-            JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
-            toList(); // Actualizar lista de datos
-        } else {
-            JOptionPane.showMessageDialog(this, "No se pudo insertar la información.");
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Verifique los campos numéricos (anticipo y final).", "Error", JOptionPane.ERROR_MESSAGE);
-    } catch (SQLException e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ocurrió un error al insertar los datos en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-}
 
     public FrmFactura() {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        jPanel5.setVisible(false);
+        jPanel3.setVisible(false);
+        
+        //Llamamos la tabla de agregar producto
+        this.inicializarTablaProducto();
     }
-
+    DefaultTableModel modelo;
+    Conexion conn = new Conexion("proyecto");
+    String mensaje = "";
     
+        public void mostrarInicio(){
+                    FrmInicio open = new FrmInicio();
+
+                    open.setVisible(true);
+                    this.setVisible(false);
+                    
+                }
+    
+            public void buscarCliente(){
+
+            Object dataClient[] = new Object[4];
+            modelo = (DefaultTableModel) dtClientes.getModel();
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            Statement st = null;
+            modelo.setRowCount(0);
+
+            try {
+                con = conn.getConexion();
+                st = con.createStatement();
+                rs = st.executeQuery("select * from clientes where clientName like '%" + txtFinalClient.getText() + "%'");
+
+                while(rs.next()){
+                    dataClient[0] = rs.getString("id");
+                    dataClient[1] = rs.getString("clientName");
+                    dataClient[2] = rs.getString("idClient");
+                    dataClient[3] = rs.getString("adressClient");
+
+                    modelo.addRow(dataClient);
+
+                    dtClientes.setModel(modelo);
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error en la consulta. problema en BuscarCliente");
+            }
+
+        }  
+        private void limpiarCamposCliente() {
+        txtClientCode.setText("");
+        txtFinalClient.setText("");
+        txtRtn.setText("");
+        txtDirection.setText("");
+        }    
+        public void mostrarCliente(String Id) {
+            Connection con = null;
+            ResultSet rs = null;
+            PreparedStatement pst = null;
+
+            try {
+                // Obtener conexión
+                con = conn.getConexion();
+
+                // Consulta SQL para buscar cliente por id
+                String consulta = "SELECT * FROM clientes WHERE id = ?"; // Uso de ? para seguridad
+
+                // Crear el PreparedStatement
+                pst = con.prepareStatement(consulta);
+
+                // Establecer el parámetro de la consulta
+                pst.setString(1, Id.trim()); // Usar .trim() para eliminar espacios si es necesario
+
+                // Ejecutar la consulta
+                rs = pst.executeQuery();
+
+                // Comprobar si se encontraron datos
+                if (rs.next()) {
+                    // Asignar los datos a los campos correspondientes
+                    txtClientCode.setText(rs.getString("id"));
+                    txtFinalClient.setText(rs.getString("clientName"));
+                    txtRtn.setText(rs.getString("rtnClient"));
+                    txtDirection.setText(rs.getString("adressClient"));
+
+                } else {
+                    // En caso de que no se encuentren resultados
+                    JOptionPane.showMessageDialog(null, "No se encontraron datos para el cliente con el ID proporcionado.");
+                    System.out.println("No se encontraron datos para el ID: " + Id);
+                }
+            } catch (Exception e) {
+                // Manejo de excepciones
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
+                } finally {
+                    // Cerrar solo los recursos necesarios
+                    try {
+                        if (rs != null) rs.close();
+                        if (pst != null) pst.close();
+                        // Nota: No cerramos la conexión aquí
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            public void buscarProducto(){
+
+            Object dataClient[] = new Object[3];
+            modelo = (DefaultTableModel) tblProducto.getModel();
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            Statement st = null;
+            modelo.setRowCount(0);
+
+            try {
+                con = conn.getConexion();
+                st = con.createStatement();
+                rs = st.executeQuery("select * from productos where productName like '%" + txtBuscarProducto.getText() + "%'");
+
+                while(rs.next()){
+                    dataClient[0] = rs.getString("id");
+                    dataClient[1] = rs.getString("productName");
+                    dataClient[2] = rs.getString("productCode");
+
+                    modelo.addRow(dataClient);
+
+                    tblProducto.setModel(modelo);
+
+                }
+            } catch (Exception e) {
+                System.out.println("Error en la consulta. problema en BuscarCliente");
+            }
+
+        }
+            
+        //Modelo de los datos 
+            
+            private DefaultTableModel modeloDatosProductos;
+        // METODO PARA INICIALIZAR LA TABLA
+        private void inicializarTablaProducto(){
+            modeloDatosProductos = new DefaultTableModel();
+            //añadir  columnas 
+            
+            modeloDatosProductos.addColumn("N");
+            modeloDatosProductos.addColumn("Nombre");
+            modeloDatosProductos.addColumn("Cantidad");
+            modeloDatosProductos.addColumn("P. Unitario");
+            modeloDatosProductos.addColumn("SubTotal");
+            modeloDatosProductos.addColumn("Descuento");
+            modeloDatosProductos.addColumn("Iva");
+            modeloDatosProductos.addColumn("Total Pagar");
+            modeloDatosProductos.addColumn("Acción");
+            
+            //agregar los datos del modelo a la tabla 
+            
+            this.jTableProductos.setModel(modeloDatosProductos);
+            
+        }
+       
+
+            
+ 
+            
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -87,11 +203,15 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         lblPhone3 = new javax.swing.JLabel();
         lblPhone5 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         lblPhone7 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        dtClientes = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblProducto = new javax.swing.JTable();
         btnSave = new javax.swing.JButton();
         btnSearchFactureNumber = new javax.swing.JButton();
         btnSearch = new javax.swing.JButton();
@@ -104,12 +224,11 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableProductos = new javax.swing.JTable();
         txtClientCode = new javax.swing.JTextField();
         txtFinalClient = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        txtObservaciones = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         cboFormaDePago = new javax.swing.JComboBox<>();
         txtTotal = new javax.swing.JTextField();
@@ -118,6 +237,12 @@ public class FrmFactura extends javax.swing.JFrame {
         txtEfectivo = new javax.swing.JTextField();
         txtCambio = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextPane1 = new javax.swing.JTextPane();
+        txtBuscarProducto = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -168,16 +293,6 @@ public class FrmFactura extends javax.swing.JFrame {
         lblPhone5.setText("CERRAR");
         jPanel1.add(lblPhone5, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 690, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 36)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("Facturas SairCell");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 20, -1, -1));
-
-        jLabel5.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("12/1/2024");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 60, -1, -1));
-
         jLabel6.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 24)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("RTN");
@@ -193,6 +308,75 @@ public class FrmFactura extends javax.swing.JFrame {
         lblPhone7.setForeground(new java.awt.Color(255, 255, 255));
         lblPhone7.setText("IMPRIMIR");
         jPanel1.add(lblPhone7, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 690, -1, -1));
+
+        dtClientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "NOMBRE", "IDENTIDAD", "DIRECCION"
+            }
+        ));
+        dtClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dtClientesMouseClicked(evt);
+            }
+        });
+        dtClientes.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                dtClientesKeyPressed(evt);
+            }
+        });
+        jScrollPane1.setViewportView(dtClientes);
+        if (dtClientes.getColumnModel().getColumnCount() > 0) {
+            dtClientes.getColumnModel().getColumn(0).setPreferredWidth(30);
+            dtClientes.getColumnModel().getColumn(0).setMaxWidth(50);
+        }
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 1050, 130));
+
+        tblProducto.setBackground(new java.awt.Color(255, 255, 255));
+        tblProducto.setForeground(new java.awt.Color(0, 0, 0));
+        tblProducto.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "NOMBRE", "CODIGO"
+            }
+        ));
+        tblProducto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblProductoMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(tblProducto);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 890, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 440, 890, 150));
 
         btnSave.setBackground(new java.awt.Color(255, 204, 51));
         btnSave.setForeground(new java.awt.Color(255, 204, 51));
@@ -220,6 +404,12 @@ public class FrmFactura extends javax.swing.JFrame {
         cboFactureState.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Factura Activa", "Factura Inactiva" }));
         cboFactureState.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel1.add(cboFactureState, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 60, 160, 30));
+
+        txtNumeroFactura.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtNumeroFacturaKeyPressed(evt);
+            }
+        });
         jPanel1.add(txtNumeroFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 100, 400, 30));
         jPanel1.add(txtDirection, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 180, 530, 30));
 
@@ -255,23 +445,38 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel9.setText("Cliente Final");
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 180, -1));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableProductos.setBackground(new java.awt.Color(255, 255, 255));
+        jTableProductos.setForeground(new java.awt.Color(255, 255, 255));
+        jTableProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {},
-                {},
-                {},
-                {}
+
             },
             new String [] {
-
+                "ID", "NOMBRE", "CODIGO", "CANTIDAD", "PRECIO"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        jScrollPane2.setViewportView(jTableProductos);
+        if (jTableProductos.getColumnModel().getColumnCount() > 0) {
+            jTableProductos.getColumnModel().getColumn(0).setPreferredWidth(50);
+            jTableProductos.getColumnModel().getColumn(0).setMaxWidth(50);
+            jTableProductos.getColumnModel().getColumn(2).setPreferredWidth(200);
+            jTableProductos.getColumnModel().getColumn(2).setMaxWidth(200);
+            jTableProductos.getColumnModel().getColumn(3).setPreferredWidth(80);
+            jTableProductos.getColumnModel().getColumn(3).setMaxWidth(80);
+            jTableProductos.getColumnModel().getColumn(4).setPreferredWidth(70);
+            jTableProductos.getColumnModel().getColumn(4).setMaxWidth(70);
+        }
 
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 230, 1060, 360));
 
         txtClientCode.setEditable(false);
         jPanel1.add(txtClientCode, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 160, 30));
+
+        txtFinalClient.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtFinalClientKeyPressed(evt);
+            }
+        });
         jPanel1.add(txtFinalClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 140, 530, 30));
 
         jPanel2.setBackground(new java.awt.Color(255, 204, 102));
@@ -281,10 +486,6 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("FORMA DE PAGO");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 110, 150, 20));
-
-        txtObservaciones.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        txtObservaciones.setText(" ");
-        jPanel2.add(txtObservaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 280, 290));
 
         jLabel8.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -332,7 +533,58 @@ public class FrmFactura extends javax.swing.JFrame {
         jLabel13.setText("CAMBIO");
         jPanel2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 280, 150, 20));
 
+        jScrollPane4.setViewportView(jTextPane1);
+
+        jPanel2.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 390, 280, 280));
+
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 10, 370, 700));
+
+        txtBuscarProducto.setText("Buscar Producto");
+        txtBuscarProducto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtBuscarProductoKeyPressed(evt);
+            }
+        });
+        jPanel1.add(txtBuscarProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 630, 230, 40));
+
+        jPanel4.setBackground(new java.awt.Color(255, 204, 153));
+        jPanel4.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel4.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 36)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Facturas SairCell");
+
+        jLabel5.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText("12/1/2024");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(95, 95, 95)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(105, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel4)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(0, 38, Short.MAX_VALUE)
+                .addComponent(jLabel5))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jLabel4)
+                    .addGap(0, 17, Short.MAX_VALUE)))
+        );
+
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 30, 290, 60));
 
         lblBackground.setBackground(new java.awt.Color(255, 255, 102));
         lblBackground.setForeground(new java.awt.Color(255, 255, 102));
@@ -373,12 +625,48 @@ public class FrmFactura extends javax.swing.JFrame {
 
     private void btnSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSave1ActionPerformed
       
-        AddNewFacture();
+        
     }//GEN-LAST:event_btnSave1ActionPerformed
 
     private void txtEfectivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEfectivoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEfectivoActionPerformed
+
+    private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        limpiarCamposCliente();
+        int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
+        String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
+
+        System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
+
+        mostrarCliente(id);  // Pasar el id al método mostrarCliente
+        
+        jPanel5.setVisible(false);  // Ocultar el panel (si es necesario)        
+    }//GEN-LAST:event_dtClientesMouseClicked
+
+    private void dtClientesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dtClientesKeyPressed
+        
+    }//GEN-LAST:event_dtClientesKeyPressed
+
+    private void txtNumeroFacturaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNumeroFacturaKeyPressed
+        
+    }//GEN-LAST:event_txtNumeroFacturaKeyPressed
+
+    private void txtFinalClientKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFinalClientKeyPressed
+        jPanel5.setVisible(true);
+        buscarCliente();
+    }//GEN-LAST:event_txtFinalClientKeyPressed
+
+    private void tblProductoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblProductoMouseClicked
+        int combo = this.tblProducto.getSelectedColumn();
+        //validamos que selecciono un producto
+        
+    }//GEN-LAST:event_tblProductoMouseClicked
+
+    private void txtBuscarProductoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarProductoKeyPressed
+        buscarProducto();
+        jPanel3.setVisible(true);
+    }//GEN-LAST:event_txtBuscarProductoKeyPressed
 
     /**
      * @param args the command line arguments
@@ -436,6 +724,7 @@ public class FrmFactura extends javax.swing.JFrame {
     private javax.swing.JButton btnSearchFactureNumber;
     private javax.swing.JComboBox<String> cboFactureState;
     private javax.swing.JComboBox<String> cboFormaDePago;
+    private javax.swing.JTable dtClientes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -451,20 +740,28 @@ public class FrmFactura extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTable jTableProductos;
+    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblPhone3;
     private javax.swing.JLabel lblPhone5;
     private javax.swing.JLabel lblPhone7;
     private javax.swing.JLabel lblPhone8;
+    private javax.swing.JTable tblProducto;
+    private javax.swing.JTextField txtBuscarProducto;
     private javax.swing.JTextField txtCambio;
     private javax.swing.JTextField txtClientCode;
     private javax.swing.JTextField txtDirection;
     private javax.swing.JTextField txtEfectivo;
     private javax.swing.JTextField txtFinalClient;
     private javax.swing.JTextField txtNumeroFactura;
-    private javax.swing.JTextField txtObservaciones;
     private javax.swing.JTextField txtRtn;
     private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables

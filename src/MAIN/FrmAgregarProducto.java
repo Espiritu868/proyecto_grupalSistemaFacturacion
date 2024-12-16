@@ -3,6 +3,7 @@ package MAIN;
 
 import DAO.Conexion;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +12,9 @@ import static java.util.stream.Collectors.toList;
 import javax.swing.JOptionPane;
 import javax.swing.plaf.PanelUI;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 
 /**
  *
@@ -26,7 +30,13 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         txtIdProducto.setVisible(false);
         btnActualizar.setEnabled(false);
         
+        
     }
+    
+
+
+
+
     DefaultTableModel modelo;
         
     Conexion conn = new Conexion("proyecto");
@@ -85,6 +95,8 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
                 }
             }
         }
+            
+            
             public void buscarProducto(){
 
             Object dataClient[] = new Object[3];
@@ -219,20 +231,20 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         PreparedStatement ps = null;
 
         try {
-            // Obtener la fila seleccionada
+         
             int selectedRow = tblProducto.getSelectedRow();
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, selecciona un producto para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                return; // Salir si no hay selección
+                return; 
             }
 
-            // Obtener el ID del cliente seleccionado desde la tabla
-            int idClient = Integer.parseInt(tblProducto.getValueAt(selectedRow, 0).toString()); // Suponiendo que el ID está en la primera columna
+       
+            int idClient = Integer.parseInt(tblProducto.getValueAt(selectedRow, 0).toString());
 
-            // Confirmar la eliminación
+   
             int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar este cliente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
             if (confirm != JOptionPane.YES_OPTION) {
-                return; // Salir si el usuario no confirma
+                return; 
             }
 
             con = conn.getConexion();
@@ -246,7 +258,7 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
             if (rowsDeleted > 0) {
                 JOptionPane.showMessageDialog(this, "¡Producto eliminado exitosamente!");
                 
-                toList(); // Actualizar la tabla
+                toList();
                 mostrarInicio();
             } else {
                 JOptionPane.showMessageDialog(this, "No se encontró el cliente a eliminar.");
@@ -266,7 +278,42 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         }
 
     }
-            
+    
+                private void mostrarNuevoID() {
+        try {
+            // Conexión a la base de datos
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto", "root", "");
+
+            // Consulta para obtener el último ID de la tabla 'clientes'
+            String sql = "SELECT MAX(id) AS ultimo_id FROM productos";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            int nuevoID = 1; // Valor por defecto si no hay registros aún
+
+            if (rs.next()) {
+            int ultimoID = rs.getInt("ultimo_id");
+            System.out.println("Último ID encontrado: " + ultimoID);
+            nuevoID = ultimoID + 1; // Incrementa el último ID
+            }
+
+            System.out.println("Nuevo ID a mostrar: " + nuevoID);
+            txtCode.setText(String.valueOf(nuevoID));
+
+
+            // Muestra el nuevo ID en el campo txtID
+            txtCode.setText(String.valueOf(nuevoID));
+
+            // Cierra la conexión
+            rs.close();
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener el nuevo ID", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -302,12 +349,27 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblBackground2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("PRODUCTOS");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnSearch.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
+        btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearch.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
         jPanel.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 150, 70, 50));
 
         lblNombreProducto.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
@@ -316,7 +378,8 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblNombreProducto.setText("Buscar Producto");
         jPanel.add(lblNombreProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, 230, -1));
 
-        txtNombreProducto.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtNombreProducto.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        txtNombreProducto.setText("Ingrese Nombre Cliente");
         txtNombreProducto.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtNombreProductoKeyPressed(evt);
@@ -330,7 +393,7 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblCodigo1.setText("Codigo");
         jPanel.add(lblCodigo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 240, 220, -1));
 
-        txtCode.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtCode.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel.add(txtCode, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 240, 130, -1));
 
         lblCodigo4.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
@@ -339,10 +402,15 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblCodigo4.setText("Precio Costo");
         jPanel.add(lblCodigo4, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 220, -1));
 
-        txtPriceCost.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtPriceCost.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtPriceCost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPriceCostActionPerformed(evt);
+            }
+        });
         jPanel.add(txtPriceCost, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 240, 130, -1));
 
-        txtQuantityInStock.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtQuantityInStock.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel.add(txtQuantityInStock, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 280, 130, -1));
 
         lblCodigo2.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
@@ -351,7 +419,12 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblCodigo2.setText("Cantidad en Stock");
         jPanel.add(lblCodigo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 280, 220, -1));
 
-        txtPriceShop.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtPriceShop.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtPriceShop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPriceShopActionPerformed(evt);
+            }
+        });
         jPanel.add(txtPriceShop, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 280, 130, -1));
 
         lblCodigo.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 18)); // NOI18N
@@ -366,7 +439,12 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         lblNombreProducto1.setText(" Nombre  Producto");
         jPanel.add(lblNombreProducto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 200, 230, -1));
 
-        txtProductName.setFont(new java.awt.Font("Exotc350 Bd BT", 0, 14)); // NOI18N
+        txtProductName.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtProductName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtProductNameKeyPressed(evt);
+            }
+        });
         jPanel.add(txtProductName, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 200, 450, -1));
 
         lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
@@ -439,6 +517,11 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
         tblProducto.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblProductoMouseClicked(evt);
+            }
+        });
+        tblProducto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tblProductoKeyPressed(evt);
             }
         });
         jScrollPane1.setViewportView(tblProducto);
@@ -523,7 +606,7 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnReturn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturn1ActionPerformed
-        
+    mostrarInicio();
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnClose1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClose1ActionPerformed
@@ -531,6 +614,7 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_btnClose1ActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        
         InsertNewProduct();
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -561,6 +645,35 @@ public class FrmAgregarProducto extends javax.swing.JFrame {
     deleteProducto();
 
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void txtProductNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtProductNameKeyPressed
+        btnSave.setEnabled(true);
+    }//GEN-LAST:event_txtProductNameKeyPressed
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        txtNombreProducto.requestFocusInWindow();
+        txtNombreProducto.selectAll();
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void tblProductoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblProductoKeyPressed
+        btnSave.setEnabled(false);
+    }//GEN-LAST:event_tblProductoKeyPressed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowActivated
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        mostrarNuevoID();
+    }//GEN-LAST:event_formWindowOpened
+
+    private void txtPriceCostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceCostActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPriceCostActionPerformed
+
+    private void txtPriceShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceShopActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPriceShopActionPerformed
 
     /**
      * @param args the command line arguments

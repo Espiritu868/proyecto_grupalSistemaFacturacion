@@ -3,12 +3,15 @@ package MAIN;
 
 
 import DAO.Conexion;
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.ResultSet;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 
 
 /**
@@ -17,48 +20,69 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FrmSetup extends javax.swing.JFrame {
     
-    
+    Conexion conn = new Conexion("proyecto");
     
     public FrmSetup() {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
-        pUsers.setVisible(false);
+       
         
     }
-    DefaultTableModel modelo;
-    Conexion conn = new Conexion("proyecto_grupal");
     
-    private void toList(){
-        
-    Object dataClient[] = new Object[4];
-    modelo = (DefaultTableModel) tblUsers.getModel();
-    java.sql.Connection con = null;
-    java.sql.PreparedStatement ps = null;
-    java.sql.ResultSet rs = null;
-    Statement st = null;
-    modelo.setRowCount(0);
     
+   public void VerificarUsuario() {
+    Conexion conn = new Conexion("proyecto");
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+
     try {
-        con = conn.getConexion();
-        st = con.createStatement();
-        rs = st.executeQuery("select * from dbusers ");
-        
-        while(rs.next()){
-            dataClient[0] = rs.getString("Id");
-            dataClient[1] = rs.getString("User");
-            dataClient[2] = rs.getString("Password"); 
-            modelo.addRow(dataClient);
-            
-            tblUsers.setModel(modelo);
-            
+        // Obtener la conexión existente
+        Connection con = conn.getConexion();
+
+        // Consulta SQL para verificar el usuario y contraseña
+        String consulta = "SELECT * FROM users WHERE user = ? AND password = ?";
+
+        // Crear el PreparedStatement
+        pst = con.prepareStatement(consulta);
+
+        // Establecer los parámetros con los datos de los JTextField
+        pst.setString(1, txtUsuario.getText().trim());
+        pst.setString(2, pswrContrasenia.getText().trim());
+
+        // Ejecutar la consulta
+        rs = pst.executeQuery();
+
+        // Comprobar si los datos coinciden
+        if (rs.next()) {
+            // Usuario y contraseña correctos
+            JOptionPane.showMessageDialog(null, "¡Bienvenido!");
+
+            // Abrir el formulario de menú
+            FrmInicio menu = new FrmInicio();
+            menu.setVisible(true);
+
+            // Cerrar el formulario actual (login)
+            this.dispose();
+        } else {
+            // Si no se encuentran coincidencias
+            JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos.");
         }
     } catch (Exception e) {
-        System.out.println("Error en la consulta.");
+        // Manejo de errores
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Ocurrió un error al verificar el usuario: " + e.getMessage());
+    } finally {
+        // Cerrar recursos utilizados (ResultSet y PreparedStatement)
+        try {
+            if (rs != null) rs.close();
+            if (pst != null) pst.close();
+            // No cerramos la conexión aquí porque es manejada en otra parte
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-        
-}   
-
+}
 
     
     @SuppressWarnings("unchecked")
@@ -76,12 +100,10 @@ public class FrmSetup extends javax.swing.JFrame {
         lblSairTech = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        pUsers = new java.awt.Panel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tblUsers = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("SETUP");
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -107,6 +129,11 @@ public class FrmSetup extends javax.swing.JFrame {
         jPanel2.add(btnIngresar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 420, 240, 40));
 
         pswrContrasenia.setBackground(new java.awt.Color(102, 102, 102));
+        pswrContrasenia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pswrContraseniaActionPerformed(evt);
+            }
+        });
         jPanel2.add(pswrContrasenia, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 330, 230, 30));
 
         txtUsuario.setBackground(new java.awt.Color(102, 102, 102));
@@ -150,33 +177,6 @@ public class FrmSetup extends javax.swing.JFrame {
         jLabel1.setText("CONTRASEÑA");
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, 140, -1));
 
-        tblUsers.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "ID", "User ", "Password"
-            }
-        ));
-        jScrollPane1.setViewportView(tblUsers);
-
-        javax.swing.GroupLayout pUsersLayout = new javax.swing.GroupLayout(pUsers);
-        pUsers.setLayout(pUsersLayout);
-        pUsersLayout.setHorizontalGroup(
-            pUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pUsersLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        pUsersLayout.setVerticalGroup(
-            pUsersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pUsersLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 403, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-
-        jPanel2.add(pUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 110, 290, 350));
-
         jLabel7.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\cat orange (1)redimensionado.jpg")); // NOI18N
         jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 940, -1));
 
@@ -198,21 +198,7 @@ public class FrmSetup extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresar1ActionPerformed
-        // TODO add your handling code here:
-
-        String usuario = txtUsuario.getText();
-        String contrasenia = pswrContrasenia.getText();
-
-        if ("ADMIN".equals(usuario) && "ADMIN".equals(contrasenia)) {
-
-            FrmInicio open = new FrmInicio();
-            open.setVisible(true);
-            this.setVisible(false);
-        }else{
-
-            JOptionPane.showMessageDialog(null, "Datos Incorrectos. Intentalo de nuevo.");
-
-        }
+        VerificarUsuario();
     }//GEN-LAST:event_btnIngresar1ActionPerformed
 
     private void btnHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHelpActionPerformed
@@ -220,6 +206,13 @@ public class FrmSetup extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null,"En caso de tener algun problema, comuniquese al +504 3368-0903");
     }//GEN-LAST:event_btnHelpActionPerformed
 
+    private void pswrContraseniaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pswrContraseniaActionPerformed
+                                                 
+    btnIngresar1.doClick(); // Simula el clic en el botón
+    
+    }//GEN-LAST:event_pswrContraseniaActionPerformed
+
+    
     /**
      * @param args the command line arguments
      */
@@ -279,11 +272,8 @@ public class FrmSetup extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblSairTech;
-    private java.awt.Panel pUsers;
     private javax.swing.JPasswordField pswrContrasenia;
-    private javax.swing.JTable tblUsers;
     private javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }

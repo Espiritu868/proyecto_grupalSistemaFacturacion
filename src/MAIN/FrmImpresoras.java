@@ -26,6 +26,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
         txtIdCliente.setVisible(false);
         txtIdentidadCliente.setVisible(false);
         btnActualizar.setEnabled(false);
+        btnSave.setEnabled(false);
     }
     
         public void mostrarInicio(){
@@ -109,16 +110,16 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 // Manejo de excepciones
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
-            } finally {
-                // Cerrar recursos
-                try {
-                    if (rs != null) rs.close();
-                    if (pst != null) pst.close();
-                    if (con != null) con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
+              } finally {
+        // Cerrar solo los recursos necesarios
+            try {
+            if (rs != null) rs.close();
+            if (pst != null) pst.close();
+            // Nota: No cerramos la conexión aquí
+         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
         }
         
                 public void InsertNewPrinter() {
@@ -203,6 +204,13 @@ public class FrmImpresoras extends javax.swing.JFrame {
                 }
             }
         }
+        
+    private void limpiarCamposCliente() {
+    txtIdentidadCliente.setText("");
+    txtNombreCliente.setText("");
+    txtTelefono.setText("");
+    txtDireccion.setText("");
+    }
                 
         public void buscarEquipoCliente() {
             // Crear una instancia de Conexion para conectar con la base de datos
@@ -430,6 +438,34 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
     }
          
+private void CalcularPendiente() {
+    try {
+        // Obtener los valores de los campos
+        int costo = Integer.parseInt(txtCosto.getText());
+        int anticipo = Integer.parseInt(txtAnticipo.getText());
+
+        // Verificar que el anticipo no sea mayor que el costo
+        if (anticipo > costo) {
+            JOptionPane.showMessageDialog(this, 
+                "El anticipo no puede ser mayor que el costo.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            txtAnticipo.setText(""); // Limpiar el campo de anticipo
+            txtFinal.setText(""); // Limpiar el campo final
+            return; // Salir del método
+        }
+
+        // Calcular el valor final
+        int finalValue = costo - anticipo;
+
+        // Mostrar el valor final en el campo de texto
+        txtFinal.setText(String.valueOf(finalValue));
+    } catch (NumberFormatException e) {
+        // Manejo de errores: si los campos no tienen números, dejar final en blanco
+        txtFinal.setText("");
+    }
+}
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -486,6 +522,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("IMPRESORAS");
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -566,13 +603,10 @@ public class FrmImpresoras extends javax.swing.JFrame {
         );
         panel4Layout.setVerticalGroup(
             panel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(348, 348, 348))
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
         );
 
-        jPanel1.add(panel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 100));
+        jPanel1.add(panel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 440));
 
         txtNombreCliente.setEditable(false);
         jPanel1.add(txtNombreCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 360, -1));
@@ -649,12 +683,24 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         cboModelo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "          ", "EPSON", "CANON", "BROTHER", "HP", "OTROS", " ", " ", " " }));
         jPanel1.add(cboModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 140, 100, -1));
+
+        txtAnticipo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtAnticipoKeyReleased(evt);
+            }
+        });
         jPanel1.add(txtAnticipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 220, 60, 30));
 
         lblServiceTag4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblServiceTag4.setForeground(new java.awt.Color(255, 255, 255));
         lblServiceTag4.setText("Costo");
         jPanel1.add(lblServiceTag4, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 220, -1, 20));
+
+        txtCosto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCostoKeyReleased(evt);
+            }
+        });
         jPanel1.add(txtCosto, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 220, 60, 30));
 
         lblServiceTag5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
@@ -667,6 +713,7 @@ public class FrmImpresoras extends javax.swing.JFrame {
         lblServiceTag3.setText("Pendiente");
         jPanel1.add(lblServiceTag3, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 220, -1, 20));
 
+        txtFinal.setEditable(false);
         txtFinal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtFinalActionPerformed(evt);
@@ -678,12 +725,22 @@ public class FrmImpresoras extends javax.swing.JFrame {
         btnSearchEquip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearchEquip.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchEquip.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearchEquip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchEquipActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnSearchEquip, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 20, 70, 50));
 
         btnSearch.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearch.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 20, 70, 50));
 
         txtIngreseNombreCliente.setText(" Ingrese Nombre Cliente");
@@ -704,10 +761,10 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         btnReturn1.setBackground(new java.awt.Color(255, 204, 51));
         btnReturn1.setForeground(new java.awt.Color(255, 204, 51));
-        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
+        btnReturn1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
         btnReturn1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\return_48.png")); // NOI18N
-        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\Retur_72.png")); // NOI18N
+        btnReturn1.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48pp.png")); // NOI18N
+        btnReturn1.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\return48x48.png")); // NOI18N
         btnReturn1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnReturn1ActionPerformed(evt);
@@ -722,10 +779,10 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         btnClose2.setBackground(new java.awt.Color(255, 204, 51));
         btnClose2.setForeground(new java.awt.Color(255, 204, 51));
-        btnClose2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
+        btnClose2.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
         btnClose2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnClose2.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_48.png")); // NOI18N
-        btnClose2.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\close_72.png")); // NOI18N
+        btnClose2.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50pp.png")); // NOI18N
+        btnClose2.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\cerrar 50x50.png")); // NOI18N
         btnClose2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClose2ActionPerformed(evt);
@@ -740,9 +797,10 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         btnSave.setBackground(new java.awt.Color(255, 204, 51));
         btnSave.setForeground(new java.awt.Color(255, 204, 51));
-        btnSave.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
-        btnSave.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
-        btnSave.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\save64x64.png")); // NOI18N
+        btnSave.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48pp.png")); // NOI18N
+        btnSave.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSave.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48pp.png")); // NOI18N
+        btnSave.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\SAVE48X48.png")); // NOI18N
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
@@ -849,6 +907,8 @@ public class FrmImpresoras extends javax.swing.JFrame {
     }//GEN-LAST:event_dtClientesKeyPressed
 
     private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        limpiarCamposCliente();
+        
         int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
         String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
 
@@ -856,6 +916,8 @@ public class FrmImpresoras extends javax.swing.JFrame {
 
         mostrarCliente(id);  // Pasar el id al método mostrarCliente
         jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
+        btnSave.setEnabled(true);
+        btnActualizar.setEnabled(false);
     }//GEN-LAST:event_dtClientesMouseClicked
 
     private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
@@ -887,6 +949,24 @@ public class FrmImpresoras extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         deleteImpresoras();
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void txtCostoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostoKeyReleased
+    CalcularPendiente();        
+    }//GEN-LAST:event_txtCostoKeyReleased
+
+    private void txtAnticipoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAnticipoKeyReleased
+    CalcularPendiente();
+    }//GEN-LAST:event_txtAnticipoKeyReleased
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+    txtIngreseNombreCliente.requestFocusInWindow(); // Da el foco al JTextField
+    txtIngreseNombreCliente.selectAll();        
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnSearchEquipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchEquipActionPerformed
+        txtBuscarEquipoCliente.requestFocusInWindow();
+        txtBuscarEquipoCliente.selectAll();
+    }//GEN-LAST:event_btnSearchEquipActionPerformed
 
     /**
      * @param args the command line arguments

@@ -7,8 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import static java.util.stream.Collectors.toList;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,10 +27,13 @@ public class FrmComputadoras extends javax.swing.JFrame {
         transparentButton();
         toList();
         jPanel2.setVisible(false);
-        panel1.setVisible(false); 
+        panel2.setVisible(false);
         btnActualizar.setEnabled(false);
         txtIdCliente.setVisible(false);
         txtIdentidadCliente.setVisible(false);
+        btnSave.setEnabled(false);
+        setInitialValues();
+        
     }
     
     DefaultTableModel modelo;
@@ -165,8 +172,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
                 Integer anticipo = Integer.parseInt(txtAnticipo.getText().trim());
                 Integer pendiente = Integer.parseInt(txtFinal.getText().trim());
 
-                String problema = txtProblem.getText().trim();
-                String diagnostico = txtDiagnostic.getText().trim();
+                String problema = txtProblema.getText().trim();
+                String diagnostico = txtProblema.getText().trim();
 
                 // Validar campos obligatorios
                 if (name.isEmpty() || phone.isEmpty() || adress.isEmpty() || model.isEmpty() || serviceTag.isEmpty()) {
@@ -219,6 +226,47 @@ public class FrmComputadoras extends javax.swing.JFrame {
             }
         }
     
+        private void CalcularPendiente() {
+            try {
+                // Obtener los valores de los campos como double
+                double costo = Double.parseDouble(txtCosto.getText());
+                double anticipo = Double.parseDouble(txtAnticipo.getText());
+
+                // Verificar que el anticipo no sea mayor que el costo
+                if (anticipo > costo) {
+                    JOptionPane.showMessageDialog(this, 
+                        "El anticipo no puede ser mayor que el costo.", 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    txtAnticipo.setText(""); // Limpiar el campo de anticipo
+                    txtFinal.setText(""); // Limpiar el campo final
+                    return; // Salir del método
+                }
+
+                // Calcular el valor final
+                double finalValue = costo - anticipo;
+
+                // Crear un formato para mostrar los valores con dos decimales
+                DecimalFormat df = new DecimalFormat("0.00");
+
+                // Mostrar el valor final en el campo de texto
+                txtFinal.setText(df.format(finalValue));
+
+            } catch (NumberFormatException e) {
+                // Manejo de errores: si los campos no tienen números, dejar final en blanco
+                txtFinal.setText("");
+            }
+        }
+
+        // Para asegurarte de que los JTextField inicien con el valor 0.00
+        private void setInitialValues() {
+            DecimalFormat df = new DecimalFormat("0.00");
+            txtCosto.setText(df.format(0.00));
+            txtAnticipo.setText(df.format(0.00));
+            txtFinal.setText(df.format(0.00));
+        }
+
+
        public void buscarEquipoCliente() {
             // Crear una instancia de Conexion para conectar con la base de datos
             Conexion conn = new Conexion("proyecto"); // "proyecto" es el nombre de tu base de datos
@@ -233,7 +281,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
             }
 
             Object[] dataClient = new Object[5];
-            modelo = (DefaultTableModel) tblEquipoCliente.getModel();
+            modelo = (DefaultTableModel) tblEquipoCliente1.getModel();
             modelo.setRowCount(0); // Limpiar tabla antes de agregar nuevas filas
 
             String query = "SELECT id, model, clientName, equipmentProblem, idClient " +
@@ -257,7 +305,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
                 }
 
                 // Actualizar el modelo de la tabla
-                tblEquipoCliente.setModel(modelo);
+                tblEquipoCliente1.setModel(modelo);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Error al buscar equipo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -311,7 +359,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
                     } else {
                         txtFinal.setText(""); // O algún valor predeterminado
                     }
-                    txtProblem.setText(rs.getString("equipmentProblem"));
+                    txtProblema.setText(rs.getString("equipmentProblem"));
                     txtDiagnostic.setText(rs.getString("diagnostic"));
 
             }
@@ -329,14 +377,14 @@ public class FrmComputadoras extends javax.swing.JFrame {
 
         try {
             // Obtener la fila seleccionada
-            int selectedRow = tblEquipoCliente.getSelectedRow();
+            int selectedRow = tblEquipoCliente1.getSelectedRow();
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, selecciona un equipo para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 return; // Salir si no hay selección
             }
 
             // Obtener el ID del cliente seleccionado desde la tabla
-            int idClient = Integer.parseInt(tblEquipoCliente.getValueAt(selectedRow, 0).toString()); // Suponiendo que el ID está en la primera columna
+            int idClient = Integer.parseInt(tblEquipoCliente1.getValueAt(selectedRow, 0).toString()); // Suponiendo que el ID está en la primera columna
 
             // Confirmar la eliminación
             int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que deseas eliminar el equipo de este cliente?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
@@ -397,7 +445,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
                String charger = String.valueOf(cboCargador.getSelectedItem());    // Cargador
                String other = String.valueOf(cboOtros.getSelectedItem());        // Otros
                String password = txtPassword.getText();  // Contraseña
-               String problem = txtProblem.getText();    // Problema del equipo
+               String problem = txtProblema.getText();    // Problema del equipo
                String diagnostic = txtDiagnostic.getText(); // Diagnóstico
                int coste = Integer.parseInt(txtCosto.getText());  // Coste
                int anticipo = Integer.parseInt(txtAnticipo.getText());  // Anticipo
@@ -456,6 +504,9 @@ public class FrmComputadoras extends javax.swing.JFrame {
            }
        }
         
+
+        
+        
         
 
 
@@ -466,9 +517,9 @@ public class FrmComputadoras extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        panel1 = new java.awt.Panel();
+        panel2 = new java.awt.Panel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tblEquipoCliente = new javax.swing.JTable();
+        tblEquipoCliente1 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         dtClientes = new javax.swing.JTable();
@@ -489,9 +540,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
         lblCargador = new javax.swing.JLabel();
         lblOtros = new javax.swing.JLabel();
         cboOtros = new javax.swing.JComboBox<>();
-        txtProblem = new javax.swing.JTextField();
         lblProblema1 = new javax.swing.JLabel();
-        txtDiagnostic = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         cboModelo = new javax.swing.JComboBox<>();
         lblServiceTag2 = new javax.swing.JLabel();
@@ -517,16 +566,20 @@ public class FrmComputadoras extends javax.swing.JFrame {
         btnActualizar = new javax.swing.JButton();
         lblPhone8 = new javax.swing.JLabel();
         btnEliminar = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        txtProblema = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtDiagnostic = new javax.swing.JTextArea();
         lblPhone5 = new javax.swing.JLabel();
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("FORMULARIO COMPUTADORAS");
+        setTitle("COMPUTADORAS");
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        tblEquipoCliente.setModel(new javax.swing.table.DefaultTableModel(
+        tblEquipoCliente1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -537,37 +590,39 @@ public class FrmComputadoras extends javax.swing.JFrame {
                 "ID", "EQUIPO", "NOMBRE", "DESCRIPCION", "FECHA"
             }
         ));
-        tblEquipoCliente.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblEquipoCliente1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblEquipoClienteMouseClicked(evt);
             }
         });
-        tblEquipoCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+        tblEquipoCliente1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 tblEquipoClienteKeyPressed(evt);
             }
         });
-        jScrollPane2.setViewportView(tblEquipoCliente);
-        if (tblEquipoCliente.getColumnModel().getColumnCount() > 0) {
-            tblEquipoCliente.getColumnModel().getColumn(0).setPreferredWidth(30);
-            tblEquipoCliente.getColumnModel().getColumn(1).setPreferredWidth(150);
-            tblEquipoCliente.getColumnModel().getColumn(2).setPreferredWidth(250);
-            tblEquipoCliente.getColumnModel().getColumn(3).setPreferredWidth(250);
-            tblEquipoCliente.getColumnModel().getColumn(4).setPreferredWidth(120);
+        jScrollPane2.setViewportView(tblEquipoCliente1);
+        if (tblEquipoCliente1.getColumnModel().getColumnCount() > 0) {
+            tblEquipoCliente1.getColumnModel().getColumn(0).setPreferredWidth(30);
+            tblEquipoCliente1.getColumnModel().getColumn(1).setPreferredWidth(150);
+            tblEquipoCliente1.getColumnModel().getColumn(2).setPreferredWidth(250);
+            tblEquipoCliente1.getColumnModel().getColumn(3).setPreferredWidth(250);
+            tblEquipoCliente1.getColumnModel().getColumn(4).setPreferredWidth(120);
         }
 
-        javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
-        panel1.setLayout(panel1Layout);
-        panel1Layout.setHorizontalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout panel2Layout = new javax.swing.GroupLayout(panel2);
+        panel2.setLayout(panel2Layout);
+        panel2Layout.setHorizontalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
         );
-        panel1Layout.setVerticalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+        panel2Layout.setVerticalGroup(
+            panel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 910, 200));
+        jPanel1.add(panel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 910, 80));
 
         dtClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -715,13 +770,11 @@ public class FrmComputadoras extends javax.swing.JFrame {
 
         cboOtros.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "      ", "Si", "No", " " }));
         jPanel1.add(cboOtros, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 160, -1, -1));
-        jPanel1.add(txtProblem, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 260, 680, 60));
 
         lblProblema1.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblProblema1.setForeground(new java.awt.Color(255, 255, 255));
         lblProblema1.setText("Diagnostico");
         jPanel1.add(lblProblema1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 330, -1, 20));
-        jPanel1.add(txtDiagnostic, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 360, 680, 60));
 
         jLabel1.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Internal Form Menu\\ordenador (1)90x90.png")); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 0, -1, 70));
@@ -739,6 +792,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
         lblServiceTag2.setText("Pendiente");
         jPanel1.add(lblServiceTag2, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 210, -1, 20));
 
+        txtFinal.setEditable(false);
+        txtFinal.setText("0.00");
         txtFinal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtFinalActionPerformed(evt);
@@ -763,6 +818,13 @@ public class FrmComputadoras extends javax.swing.JFrame {
         lblServiceTag5.setForeground(new java.awt.Color(255, 255, 255));
         lblServiceTag5.setText("Costo");
         jPanel1.add(lblServiceTag5, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 210, -1, 20));
+
+        txtCosto.setText("0.00");
+        txtCosto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCostoKeyReleased(evt);
+            }
+        });
         jPanel1.add(txtCosto, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 210, 60, -1));
 
         btnReturn1.setBackground(new java.awt.Color(255, 204, 51));
@@ -824,6 +886,13 @@ public class FrmComputadoras extends javax.swing.JFrame {
         lblServiceTag6.setForeground(new java.awt.Color(255, 255, 255));
         lblServiceTag6.setText("Anticipo");
         jPanel1.add(lblServiceTag6, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 210, -1, 20));
+
+        txtAnticipo.setText("0.00");
+        txtAnticipo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtAnticipoKeyReleased(evt);
+            }
+        });
         jPanel1.add(txtAnticipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 210, 60, -1));
 
         txtDireccion.setEditable(false);
@@ -880,6 +949,20 @@ public class FrmComputadoras extends javax.swing.JFrame {
             }
         });
         jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 430, 80, 70));
+
+        txtProblema.setColumns(20);
+        txtProblema.setLineWrap(true);
+        txtProblema.setRows(5);
+        jScrollPane3.setViewportView(txtProblema);
+
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 260, 690, 60));
+
+        txtDiagnostic.setColumns(20);
+        txtDiagnostic.setLineWrap(true);
+        txtDiagnostic.setRows(5);
+        jScrollPane5.setViewportView(txtDiagnostic);
+
+        jPanel1.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 360, 690, 60));
 
         lblPhone5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
@@ -942,11 +1025,13 @@ public class FrmComputadoras extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        
+        txtIngreseNombreCliente.requestFocusInWindow();   
+        txtIngreseNombreCliente.selectAll();
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnSearchEquipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchEquipActionPerformed
-
+        txtBuscarEquipoCliente.requestFocusInWindow();
+        txtBuscarEquipoCliente.selectAll();
     }//GEN-LAST:event_btnSearchEquipActionPerformed
 
     private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
@@ -959,6 +1044,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
         mostrarCliente(id);  // Pasar el id al método mostrarCliente
         
         jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
+        btnSave.setEnabled(true);
+        btnActualizar.setEnabled(false);
     }//GEN-LAST:event_dtClientesMouseClicked
 
     private void txtIngreseNombreClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtIngreseNombreClienteKeyPressed
@@ -980,28 +1067,13 @@ public class FrmComputadoras extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarEquipoClienteActionPerformed
 
     private void txtBuscarEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteKeyPressed
-        panel1.setVisible(true);
+        panel2.setVisible(true);
         buscarEquipoCliente();
     }//GEN-LAST:event_txtBuscarEquipoClienteKeyPressed
 
     private void txtBuscarEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtBuscarEquipoClienteMouseClicked
 
     }//GEN-LAST:event_txtBuscarEquipoClienteMouseClicked
-
-    private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
-
-    }//GEN-LAST:event_tblEquipoClienteKeyPressed
-
-    private void tblEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoClienteMouseClicked
-
-        int fila =  tblEquipoCliente.getSelectedRow();
-        String Identificador = tblEquipoCliente.getValueAt(fila, 0).toString();
-        mostrarEquipo(Identificador);
-        panel1.setVisible(false);
-        btnSave.setEnabled(false);
-        btnActualizar.setEnabled(true);
-
-    }//GEN-LAST:event_tblEquipoClienteMouseClicked
 
     private void btnActualizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnActualizarMouseClicked
         btnSave.setVisible(false);
@@ -1015,6 +1087,28 @@ public class FrmComputadoras extends javax.swing.JFrame {
         deleteClient();
         
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void txtCostoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostoKeyReleased
+     CalcularPendiente();            // TODO add your handling code here:
+    }//GEN-LAST:event_txtCostoKeyReleased
+
+    private void txtAnticipoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAnticipoKeyReleased
+    CalcularPendiente();        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAnticipoKeyReleased
+
+    private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
+
+    }//GEN-LAST:event_tblEquipoClienteKeyPressed
+
+    private void tblEquipoClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEquipoClienteMouseClicked
+
+        int fila =  tblEquipoCliente1.getSelectedRow();
+        String Identificador = tblEquipoCliente1.getValueAt(fila, 0).toString();
+        mostrarEquipo(Identificador);
+        panel2.setVisible(false);
+        btnSave.setEnabled(false);
+        btnActualizar.setEnabled(true);
+    }//GEN-LAST:event_tblEquipoClienteMouseClicked
     
     public void transparentButton(){
         btnSearch.setOpaque(false);
@@ -1081,6 +1175,8 @@ public class FrmComputadoras extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblCargador;
     private javax.swing.JLabel lblDireccion;
@@ -1102,12 +1198,12 @@ public class FrmComputadoras extends javax.swing.JFrame {
     private javax.swing.JLabel lblServiceTag5;
     private javax.swing.JLabel lblServiceTag6;
     private javax.swing.JLabel lblTelefono;
-    private java.awt.Panel panel1;
-    private javax.swing.JTable tblEquipoCliente;
+    private java.awt.Panel panel2;
+    private javax.swing.JTable tblEquipoCliente1;
     private javax.swing.JTextField txtAnticipo;
     private javax.swing.JTextField txtBuscarEquipoCliente;
     private javax.swing.JTextField txtCosto;
-    private javax.swing.JTextField txtDiagnostic;
+    private javax.swing.JTextArea txtDiagnostic;
     private javax.swing.JTextField txtDireccion;
     private javax.swing.JTextField txtFinal;
     private javax.swing.JTextField txtIdCliente;
@@ -1115,7 +1211,7 @@ public class FrmComputadoras extends javax.swing.JFrame {
     private javax.swing.JTextField txtIngreseNombreCliente;
     private javax.swing.JTextField txtNombreCliente;
     private javax.swing.JTextField txtPassword;
-    private javax.swing.JTextField txtProblem;
+    private javax.swing.JTextArea txtProblema;
     private javax.swing.JTextField txtServiceTag;
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables

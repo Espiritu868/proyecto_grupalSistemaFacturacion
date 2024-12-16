@@ -28,6 +28,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
         txtIdCliente.setVisible(false);
         txtIdentidadCliente.setVisible(false);
         btnActualizar.setEnabled(false);
+        btnSave.setEnabled(false);
     }
     DefaultTableModel modelo;
         
@@ -175,17 +176,24 @@ public class FrmTelefonos extends javax.swing.JFrame {
             } catch (Exception e) {
                 
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
-            } finally {
-                
-                try {
-                    if (rs != null) rs.close();
-                    if (pst != null) pst.close();
-                    if (con != null) con.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                            JOptionPane.showMessageDialog(null, "Ocurrió un error al consultar los datos del cliente.");
+              } finally {
+                    // Cerrar solo los recursos necesarios
+                    try {
+                        if (rs != null) rs.close();
+                        if (pst != null) pst.close();
+                        // Nota: No cerramos la conexión aquí
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
+        }
+        // Método para limpiar los campos del formulario
+        private void limpiarCamposCliente() {
+            txtIdentidadCliente.setText("");
+            txtNombreCliente.setText("");
+            txtTelefono.setText("");
+            txtDireccion.setText("");
         }
         
         public void InsertNewPhone() {
@@ -366,7 +374,6 @@ public class FrmTelefonos extends javax.swing.JFrame {
             System.out.println("Error en la consulta. Error en funcion MostrarEquipo.");
         }
         
-
         
         }
     
@@ -430,6 +437,37 @@ public class FrmTelefonos extends javax.swing.JFrame {
         }
 
     }
+        
+private void CalcularPendiente() {
+    try {
+        // Obtener los valores de los campos
+        int costo = Integer.parseInt(txtCosto.getText());
+        int anticipo = Integer.parseInt(txtAnticipo.getText());
+
+        // Verificar que el anticipo no sea mayor que el costo
+        if (anticipo > costo) {
+            JOptionPane.showMessageDialog(this, 
+                "El anticipo no puede ser mayor que el costo.", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            txtAnticipo.setText(""); // Limpiar el campo de anticipo
+            txtPendiente.setText(""); // Limpiar el campo final
+            return; // Salir del método
+        }
+
+        // Calcular el valor final
+        int finalValue = costo - anticipo;
+
+        // Mostrar el valor final en el campo de texto
+        txtPendiente.setText(String.valueOf(finalValue));
+    } catch (NumberFormatException e) {
+        // Manejo de errores: si los campos no tienen números, dejar final en blanco
+        txtPendiente.setText("");
+    }
+}
+
+
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -489,6 +527,7 @@ public class FrmTelefonos extends javax.swing.JFrame {
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("TELEFONOS");
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 102));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -529,10 +568,10 @@ public class FrmTelefonos extends javax.swing.JFrame {
         );
         panel1Layout.setVerticalGroup(
             panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
         );
 
-        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 910, 110));
+        jPanel1.add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 910, -1));
 
         dtClientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -653,6 +692,11 @@ public class FrmTelefonos extends javax.swing.JFrame {
         jPanel1.add(txtPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 210, 100, -1));
 
         txtAnticipo.setText("0");
+        txtAnticipo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtAnticipoKeyReleased(evt);
+            }
+        });
         jPanel1.add(txtAnticipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 210, 60, -1));
 
         lblServiceTag4.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
@@ -664,6 +708,11 @@ public class FrmTelefonos extends javax.swing.JFrame {
         txtCosto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCostoActionPerformed(evt);
+            }
+        });
+        txtCosto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCostoKeyReleased(evt);
             }
         });
         jPanel1.add(txtCosto, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 210, 60, -1));
@@ -745,12 +794,22 @@ public class FrmTelefonos extends javax.swing.JFrame {
         btnSearchEquip.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearchEquip.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchEquip.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearchEquip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchEquipActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnSearchEquip, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 50, 70, 50));
 
         btnSearch.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearch.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearch.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnSearch, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 50, 70, 50));
 
         txtIngreseNombreCliente.setText(" Ingrese Nombre Cliente");
@@ -860,13 +919,17 @@ public class FrmTelefonos extends javax.swing.JFrame {
     }//GEN-LAST:event_dtClientesKeyPressed
 
     private void dtClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dtClientesMouseClicked
+        limpiarCamposCliente(); 
+        
         int fila = dtClientes.getSelectedRow();  // Obtener la fila seleccionada
         String id = dtClientes.getValueAt(fila, 0).toString().trim();  // Obtener el ID y eliminar espacios en blanco
 
         System.out.println("ID obtenido de la tabla: " + id);  // Verificar el valor del ID
-
+        
         mostrarCliente(id);  // Pasar el id al método mostrarCliente
         jPanel2.setVisible(false);  // Ocultar el panel (si es necesario)
+        btnSave.setEnabled(true);
+        
     }//GEN-LAST:event_dtClientesMouseClicked
 
     private void tblEquipoClienteKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblEquipoClienteKeyPressed
@@ -904,6 +967,24 @@ public class FrmTelefonos extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
       deleteClient();
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void txtCostoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCostoKeyReleased
+    CalcularPendiente();        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCostoKeyReleased
+
+    private void txtAnticipoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAnticipoKeyReleased
+    CalcularPendiente();        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAnticipoKeyReleased
+
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        txtIngreseNombreCliente.requestFocusInWindow();  
+        txtIngreseNombreCliente.selectAll();
+    }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void btnSearchEquipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchEquipActionPerformed
+        txtBuscarEquipoCliente.requestFocusInWindow();
+        txtBuscarEquipoCliente.selectAll();
+    }//GEN-LAST:event_btnSearchEquipActionPerformed
 
     /**
      * @param args the command line arguments

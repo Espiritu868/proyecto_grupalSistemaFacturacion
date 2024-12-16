@@ -27,6 +27,8 @@ public class FrmNewClient extends javax.swing.JFrame {
     FrmInicio open = new FrmInicio();
     open.setVisible(true);
     this.setVisible(false);
+    mostrarNuevoID();
+    
     }
     
 private void toList(){
@@ -131,6 +133,7 @@ public void InsertNewClient() {
 
         if (rowsInserted > 0) {
             JOptionPane.showMessageDialog(this, "¡Datos insertados exitosamente!");
+            if (con != null) con.close();
             toList(); // Refrescar la lista si es necesario
             mostrarInicio();
         } else {
@@ -183,7 +186,7 @@ public void InsertNewClient() {
         
         toList();
         jPanel1.setVisible(false);
-
+        txtShowForId.setVisible(false);
         
     }
     
@@ -305,6 +308,113 @@ public void InsertNewClient() {
         }
 
     }
+    
+            private void mostrarNuevoID() {
+        try {
+            // Conexión a la base de datos
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/proyecto", "root", "");
+
+            // Consulta para obtener el último ID de la tabla 'clientes'
+            String sql = "SELECT MAX(id) AS ultimo_id FROM clientes";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            int nuevoID = 1; // Valor por defecto si no hay registros aún
+
+            if (rs.next()) {
+            int ultimoID = rs.getInt("ultimo_id");
+            System.out.println("Último ID encontrado: " + ultimoID);
+            nuevoID = ultimoID + 1; // Incrementa el último ID
+            }
+
+            System.out.println("Nuevo ID a mostrar: " + nuevoID);
+            txtId.setText(String.valueOf(nuevoID));
+
+
+            // Muestra el nuevo ID en el campo txtID
+            txtId.setText(String.valueOf(nuevoID));
+
+            // Cierra la conexión
+            rs.close();
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener el nuevo ID", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+        public void validarDatosCliente() {
+            Connection con = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try {
+                con = conn.getConexion();
+
+                String identidad = txtIdenty.getText();
+                String rtn = txtRTN.getText();
+                String telefono = txtPhone.getText();
+
+                // Validar que el teléfono sea válido
+                if (!telefono.matches("(\\+\\d{3})?\\d{8}")) {
+                    JOptionPane.showMessageDialog(this, "Número de teléfono no válido. Debe ser de 8 dígitos o incluir un código de país como +504.");
+                    return;
+                }
+
+                // Validar que la identidad tenga 13 dígitos
+                if (!identidad.matches("\\d{13}")) {
+                    JOptionPane.showMessageDialog(this, "Identidad no válida. Debe tener exactamente 13 dígitos.");
+                    return;
+                }
+
+                // Validar que el RTN tenga 14 dígitos
+                if (!rtn.matches("\\d{14}")) {
+                    JOptionPane.showMessageDialog(this, "RTN no válido. Debe tener exactamente 14 dígitos.");
+                    return;
+                }
+
+                // Verificar si la identidad ya existe
+                String sqlIdentidad = "SELECT clientName FROM clientes WHERE idClient = ?";
+                ps = con.prepareStatement(sqlIdentidad);
+                ps.setString(1, identidad);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    String nombreCliente = rs.getString("clientName");
+                    JOptionPane.showMessageDialog(this, "La identidad ya existe y pertenece al cliente: " + nombreCliente);
+                    return;
+                }
+
+                // Verificar si el RTN ya existe
+                String sqlRTN = "SELECT clientName FROM clientes WHERE rtnClient = ?";
+                ps = con.prepareStatement(sqlRTN);
+                ps.setString(1, rtn);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    String nombreCliente = rs.getString("clientName");
+                    JOptionPane.showMessageDialog(this, "El RTN ya existe y pertenece al cliente: " + nombreCliente);
+                    return;
+                }
+
+                // Si todo está bien, guardar los datos
+                InsertNewClient();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Ocurrió un error al validar los datos: " + e.getMessage());
+            } finally {
+                try {
+                    if (rs != null) rs.close();
+                    if (ps != null) ps.close();
+                    
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+            
+
 
     
     @SuppressWarnings("unchecked")
@@ -318,10 +428,8 @@ public void InsertNewClient() {
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         txtIdenty = new javax.swing.JTextField();
-        btnSearchForIdClient = new javax.swing.JButton();
         btnSearchforNameClient = new javax.swing.JButton();
         btnSave = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         txtShowForId = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
@@ -349,6 +457,12 @@ public void InsertNewClient() {
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("CLIENTES");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -402,17 +516,6 @@ public void InsertNewClient() {
         txtIdenty.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jPanel2.add(txtIdenty, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 240, 170, -1));
 
-        btnSearchForIdClient.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
-        btnSearchForIdClient.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnSearchForIdClient.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
-        btnSearchForIdClient.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search48x48.png")); // NOI18N
-        btnSearchForIdClient.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchForIdClientActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnSearchForIdClient, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 110, 70, 50));
-
         btnSearchforNameClient.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
         btnSearchforNameClient.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSearchforNameClient.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\search32x32.png")); // NOI18N
@@ -436,12 +539,6 @@ public void InsertNewClient() {
             }
         });
         jPanel2.add(btnSave, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 410, 90, 80));
-
-        jLabel3.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("Buscar Por ID:");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 120, 220, -1));
 
         txtShowForId.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         txtShowForId.setText("Ingrese Id Cliente");
@@ -467,7 +564,7 @@ public void InsertNewClient() {
         txtId.setEditable(false);
         txtId.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         txtId.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jPanel2.add(txtId, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 200, 170, -1));
+        jPanel2.add(txtId, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 200, 90, -1));
 
         jLabel5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -653,25 +750,16 @@ public void InsertNewClient() {
     }//GEN-LAST:event_btnReturn1ActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        InsertNewClient();
-        
-        if (mensaje == "¡Datos insertados exitosamente!"){
-        FrmInicio open = new FrmInicio();
-        open.setVisible(true);
-        this.setVisible(false);}
-        
-        String texto = txtShowForName.getText();
-        if (texto != ("Ingrese Nombre Cliente")) {
-            // Habilitar el botón
-        } else {  
-            btnSave.setEnabled(false); // Deshabilitar el botón
-        }
+        validarDatosCliente();
     }//GEN-LAST:event_btnSaveActionPerformed
     
+
+
     
     
     private void btnSearchforNameClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchforNameClientActionPerformed
-        
+        txtShowForName.requestFocusInWindow();   
+        txtShowForName.selectAll();
 
     }//GEN-LAST:event_btnSearchforNameClientActionPerformed
 
@@ -697,31 +785,9 @@ public void InsertNewClient() {
         
         
     }//GEN-LAST:event_dtClientesMouseClicked
-
-    private void txtShowForIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtShowForIdKeyPressed
-        String texto = txtShowForId.getText();
-        if (!texto.equals("Ingrese Id Cliente") && !texto.isEmpty()) {
-            jPanel1.setVisible(true);
-            
-        } else {
-            jPanel1.setVisible(false);
-        }
-        
-        
-        
-        toList();
-    }//GEN-LAST:event_txtShowForIdKeyPressed
     
     
     
-    private void txtShowForIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShowForIdActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtShowForIdActionPerformed
-
-    private void btnSearchForIdClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchForIdClientActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSearchForIdClientActionPerformed
-
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         ModificarNewClient();
     }//GEN-LAST:event_btnActualizarActionPerformed
@@ -746,6 +812,26 @@ public void InsertNewClient() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtShowForNameActionPerformed
 
+    private void txtShowForIdKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtShowForIdKeyPressed
+        String texto = txtShowForId.getText();
+        if (!texto.equals("Ingrese Id Cliente") && !texto.isEmpty()) {
+            jPanel1.setVisible(true);
+
+        } else {
+            jPanel1.setVisible(false);
+        }
+
+        toList();
+    }//GEN-LAST:event_txtShowForIdKeyPressed
+
+    private void txtShowForIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtShowForIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtShowForIdActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        mostrarNuevoID();
+    }//GEN-LAST:event_formWindowOpened
+
     
     public static void main(String args[]) {
       
@@ -761,9 +847,7 @@ public void InsertNewClient() {
         btnSearchforNameClient.setContentAreaFilled(false);
         btnSearchforNameClient.setBorderPainted(false);
         
-        btnSearchForIdClient.setOpaque(false);
-        btnSearchForIdClient.setContentAreaFilled(false);
-        btnSearchForIdClient.setBorderPainted(false);
+        
     }
     
     
@@ -775,14 +859,12 @@ public void InsertNewClient() {
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnReturn1;
     private javax.swing.JButton btnSave;
-    private javax.swing.JButton btnSearchForIdClient;
     private javax.swing.JButton btnSearchforNameClient;
     private javax.swing.JComboBox<String> cboType;
     private javax.swing.JTable dtClientes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;

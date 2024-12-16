@@ -12,6 +12,7 @@ public class FrmInicio extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         transparentButton();
+        
     }
 
     
@@ -24,6 +25,7 @@ public class FrmInicio extends javax.swing.JFrame {
         lblComputadoras2 = new javax.swing.JLabel();
         lblPhone1 = new javax.swing.JLabel();
         lblComputadoras3 = new javax.swing.JLabel();
+        btnUsers = new javax.swing.JButton();
         btnComputer = new javax.swing.JButton();
         btnPrinter = new javax.swing.JButton();
         btnPhone = new javax.swing.JButton();
@@ -35,6 +37,8 @@ public class FrmInicio extends javax.swing.JFrame {
         jPanel7 = new javax.swing.JPanel();
         lblPhone4 = new javax.swing.JLabel();
         btnClose = new javax.swing.JButton();
+        jPanel9 = new javax.swing.JPanel();
+        lblPhone7 = new javax.swing.JLabel();
         lblPhone5 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
@@ -46,6 +50,7 @@ public class FrmInicio extends javax.swing.JFrame {
         lblBackground = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("INICIO");
         setExtendedState(6);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -69,6 +74,17 @@ public class FrmInicio extends javax.swing.JFrame {
         lblComputadoras3.setForeground(new java.awt.Color(0, 0, 0));
         lblComputadoras3.setText("IMPRESORAS ");
         jPanel1.add(lblComputadoras3, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 160, -1, -1));
+
+        btnUsers.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\spy96x96pp.png")); // NOI18N
+        btnUsers.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnUsers.setPressedIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\spy96x96pp.png")); // NOI18N
+        btnUsers.setRolloverIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\spy96x96.png")); // NOI18N
+        btnUsers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsersActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnUsers, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 250, -1, -1));
 
         btnComputer.setIcon(new javax.swing.ImageIcon("C:\\Users\\chave\\OneDrive\\Documentos\\UTH\\II Parcial\\Programacion Orientada a Objetos\\PROYECTO GRUPAL\\PROYECTO_GRUPAL\\Pictures\\Iconos\\desktop90x90pp.png")); // NOI18N
         btnComputer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -191,6 +207,29 @@ public class FrmInicio extends javax.swing.JFrame {
             }
         });
         jPanel1.add(btnClose, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 420, 80, 70));
+
+        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel9.setForeground(new java.awt.Color(255, 255, 255));
+
+        lblPhone7.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
+        lblPhone7.setForeground(new java.awt.Color(0, 0, 0));
+        lblPhone7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPhone7.setText("USUARIOS");
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblPhone7, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lblPhone7))
+        );
+
+        jPanel1.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 360, 170, -1));
 
         lblPhone5.setFont(new java.awt.Font("Exotc350 Bd BT", 1, 18)); // NOI18N
         lblPhone5.setForeground(new java.awt.Color(255, 255, 255));
@@ -358,6 +397,12 @@ public class FrmInicio extends javax.swing.JFrame {
         open.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnProductAddActionPerformed
+
+    private void btnUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsersActionPerformed
+        FrmUsers open = new FrmUsers();
+        open.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnUsersActionPerformed
     
     public void transparentButton(){
        
@@ -388,6 +433,10 @@ public class FrmInicio extends javax.swing.JFrame {
         btnPrinter.setOpaque(false);
         btnPrinter.setContentAreaFilled(false);
         btnPrinter.setBorderPainted(false);
+        
+        btnUsers.setOpaque(false);
+        btnUsers.setContentAreaFilled(false);
+        btnUsers.setBorderPainted(false);
                 
     }
     
@@ -432,6 +481,7 @@ public class FrmInicio extends javax.swing.JFrame {
     private javax.swing.JButton btnPrinter;
     private javax.swing.JButton btnProductAdd;
     private javax.swing.JButton btnReturn;
+    private javax.swing.JButton btnUsers;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -440,6 +490,7 @@ public class FrmInicio extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel lblBackground;
     private javax.swing.JLabel lblComputadoras1;
     private javax.swing.JLabel lblComputadoras2;
@@ -449,6 +500,7 @@ public class FrmInicio extends javax.swing.JFrame {
     private javax.swing.JLabel lblPhone4;
     private javax.swing.JLabel lblPhone5;
     private javax.swing.JLabel lblPhone6;
+    private javax.swing.JLabel lblPhone7;
     // End of variables declaration//GEN-END:variables
 
     
